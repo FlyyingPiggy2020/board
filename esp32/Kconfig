@@ -1,0 +1,27 @@
+menu "FPSDK ESP32 BOARD CONFIG"
+config USE_BSP_USART_FIFO
+    bool "Enable bsp_usart_fifo"
+    default y
+    if USE_BSP_USART_FIFO
+        menu "USART1 CONFIG"
+        config BSP_USE_USART1
+        bool "Enable usart1"
+        default n
+        if BSP_USE_USART1
+        config USART1_RXIO
+            int "USART1 RX IO Pin"
+            default -1
+        config USART1_TXIO
+            int "USART1 TX IO Pin"
+            default -1
+        config USART1_RXBUFF_SIZE
+            int "USART1 RX Buffer Size"
+            default 1024
+        config USART1_TXBUFF_SIZE
+            int "USART1 TX Buffer Size"
+            default 1024
+        endif
+        endmenu
+    endif
+endmenu
+

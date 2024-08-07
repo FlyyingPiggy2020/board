@@ -34,10 +34,9 @@ SOFTWARE.
 
 /*---------- includes ----------*/
 
-#include "inc/bsp.h"
+#include "bsp.h"
 
-#include "esp_log.h"
-#include "driver/uart.h"
+
 /*---------- macro ----------*/
 
 #define TAG "bsp"
@@ -49,7 +48,10 @@ SOFTWARE.
 
 void bsp_init(void)
 {
-    ESP_LOGI(TAG, "bsp init");
+    ESP_LOGI(TAG, "init");
+#ifdef CONFIG_USE_BSP_USART_FIFO
+    bsp_uart_init();
+#endif
     return;
 }
 /*---------- end of file ----------*/

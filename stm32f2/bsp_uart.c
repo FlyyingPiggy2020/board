@@ -27,8 +27,8 @@ uint8_t g_uart1_rx_buf0[USART1_RX_BUF_SIZE];
 uint8_t g_uart1_rx_buf1[USART1_RX_BUF_SIZE];
 
 extern UART_HandleTypeDef huart1;
-extern DMA_HandleTypeDef  hdma_usart1_rx;
-struct pingpong_buffer    uart1_pingpong_handler;
+extern DMA_HandleTypeDef hdma_usart1_rx;
+struct pingpong_buffer uart1_pingpong_handler;
 #endif
 /*---------- function prototype ----------*/
 /*---------- variable ----------*/
@@ -36,28 +36,29 @@ struct pingpong_buffer    uart1_pingpong_handler;
 /*---------- function ----------*/
 
 /**
- * @brief 需要配合CubeMX使用，在CubeMX自动生成的串口初始化函数调用之后，再调用该函数。
+ * @brief
+ * 需要配合CubeMX使用，在CubeMX自动生成的串口初始化函数调用之后，再调用该函数。
  * @return {*}
  */
-void bsp_uart_init(void)
-{
-    void *pingpong[1] = { 0 };
-    /**
-     * @brief 初始化乒乓buffer
-     * @return {*}
-     */
-    pingpong_buffer_init(&uart1_pingpong_handler, g_uart1_rx_buf0, g_uart1_rx_buf1);
+void bsp_uart_init(void) {
+  void *pingpong[1] = {0};
+  /**
+   * @brief 初始化乒乓buffer
+   * @return {*}
+   */
+  pingpong_buffer_init(&uart1_pingpong_handler, g_uart1_rx_buf0,
+                       g_uart1_rx_buf1);
 
-    /**
-     * @brief 获取写入地址的指针
-     * @return {*}
-     */
-    pingpong_buffer_get_write_buf(&uart1_pingpong_handler, pingpong);
-    /**
-     * @brief 开启DMA接收和IDIE中断
-     * @return {*}
-     */
-    HAL_UARTEx_ReceiveToIdle_DMA(&huart1, pingpong[0], USART1_RX_BUF_SIZE);
+  /**
+   * @brief 获取写入地址的指针
+   * @return {*}
+   */
+  pingpong_buffer_get_write_buf(&uart1_pingpong_handler, pingpong);
+  /**
+   * @brief 开启DMA接收和IDIE中断
+   * @return {*}
+   */
+  HAL_UARTEx_ReceiveToIdle_DMA(&huart1, pingpong[0], USART1_RX_BUF_SIZE);
 }
 
 /**
@@ -66,16 +67,17 @@ void bsp_uart_init(void)
  * @param {uint16_t} Size
  * @return {*}
  */
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
-{
-    void *pingpong[1] = { 0 };
-    if (huart->Instance == USART1) {
-        // 当Size和USART1_RX_BUF_SIZE一样的时候，我测试下来不会触发TC，反而是触发HT。
-        if (huart->RxEventType == HAL_UART_RXEVENT_IDLE || huart->ReceptionType == HAL_UART_RXEVENT_TC || Size == USART1_RX_BUF_SIZE) {
-            pingpong_buffer_set_write_done(&uart1_pingpong_handler, Size);
-            pingpong_buffer_get_write_buf(&uart1_pingpong_handler, pingpong);
-            HAL_UARTEx_ReceiveToIdle_DMA(&huart1, pingpong[0], USART1_RX_BUF_SIZE);
-        }
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
+  void *pingpong[1] = {0};
+  if (huart->Instance == USART1) {
+    // 当Size和USART1_RX_BUF_SIZE一样的时候，我测试下来不会触发TC，反而是触发HT。
+    if (huart->RxEventType == HAL_UART_RXEVENT_IDLE ||
+        huart->ReceptionType == HAL_UART_RXEVENT_TC ||
+        Size == USART1_RX_BUF_SIZE) {
+      pingpong_buffer_set_write_done(&uart1_pingpong_handler, Size);
+      pingpong_buffer_get_write_buf(&uart1_pingpong_handler, pingpong);
+      HAL_UARTEx_ReceiveToIdle_DMA(&huart1, pingpong[0], USART1_RX_BUF_SIZE);
     }
+  }
 }
 /*---------- end of file ----------*/

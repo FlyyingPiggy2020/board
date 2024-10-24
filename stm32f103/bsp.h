@@ -21,13 +21,13 @@
 #define __STM32F1_BSP_VERSION "1.1"
 
 /* 开关全局中断的宏 */
-#define ENABLE_INT() __set_PRIMASK(0)  /* 使能全局中断 */
-#define DISABLE_INT() __set_PRIMASK(1) /* 禁止全局中断 */
+#define ENABLE_INT()          __set_PRIMASK(0) /* 使能全局中断 */
+#define DISABLE_INT()         __set_PRIMASK(1) /* 禁止全局中断 */
 
-#define ERROR_HANDLER() bsp_Error_Handler(__FILE__, __LINE__);
+#define ERROR_HANDLER()       bsp_Error_Handler(__FILE__, __LINE__);
 
 /* 默认是关闭状态 */
-#define Enable_EventRecorder 0
+#define Enable_EventRecorder  0
 
 #if Enable_EventRecorder == 1
 #include "EventRecorder.h"

@@ -45,11 +45,12 @@ SOFTWARE.
 /*---------- variable ----------*/
 /*---------- function ----------*/
 
-void bsp_init(void) {
-  ESP_LOGI(TAG, "init");
+void bsp_init(void)
+{
+    ESP_LOGI(TAG, "init");
 #ifdef CONFIG_USE_BSP_USART_FIFO
-  bsp_uart_init();
+    bsp_uart_init();
 #endif
-  return;
+    return;
 }
 /*---------- end of file ----------*/

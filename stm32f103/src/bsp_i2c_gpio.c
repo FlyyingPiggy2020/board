@@ -33,43 +33,43 @@
 /* 定义I2C总线连接的GPIO端口,
  * 用户只需要修改下面4行代码即可任意改变SCL和SDA的引脚 */
 
-#define ALL_I2C_GPIO_CLK_ENABLE()                                              \
-  {                                                                            \
-    __HAL_RCC_GPIOB_CLK_ENABLE();                                              \
-    __HAL_RCC_GPIOC_CLK_ENABLE();                                              \
-  };
+#define ALL_I2C_GPIO_CLK_ENABLE()     \
+    {                                 \
+        __HAL_RCC_GPIOB_CLK_ENABLE(); \
+        __HAL_RCC_GPIOC_CLK_ENABLE(); \
+    };
 
-#define GPIO_PORT_VCC GPIOB    /* GPIO端口 */
-#define I2C_VCC_PIN GPIO_PIN_4 /* 连接到VCC数据线的GPIO */
+#define GPIO_PORT_VCC GPIOB      /* GPIO端口 */
+#define I2C_VCC_PIN   GPIO_PIN_4 /* 连接到VCC数据线的GPIO */
 
-#define GPIO_PORT_I2C GPIOC     /* GPIO端口 */
-#define I2C_WP_PIN GPIO_PIN_13  /* 连接到WP数据线的GPIO */
-#define I2C_SCL_PIN GPIO_PIN_14 /* 连接到SCL时钟线的GPIO */
-#define I2C_SDA_PIN GPIO_PIN_15 /* 连接到SDA数据线的GPIO */
+#define GPIO_PORT_I2C GPIOC       /* GPIO端口 */
+#define I2C_WP_PIN    GPIO_PIN_13 /* 连接到WP数据线的GPIO */
+#define I2C_SCL_PIN   GPIO_PIN_14 /* 连接到SCL时钟线的GPIO */
+#define I2C_SDA_PIN   GPIO_PIN_15 /* 连接到SDA数据线的GPIO */
 
 /* 定义读写SCL和SDA的宏 */
-#define I2C_VCC_1() GPIO_PORT_VCC->BSRR = (uint32_t)I2C_VCC_PIN /* VCC = 1 */
-#define I2C_VCC_0()                                                            \
-  GPIO_PORT_VCC->BSRR = (uint32_t)I2C_VCC_PIN << 16U /* VCC = 0 */
+#define I2C_VCC_1()   GPIO_PORT_VCC->BSRR = (uint32_t)I2C_VCC_PIN /* VCC = 1 */
+#define I2C_VCC_0() \
+    GPIO_PORT_VCC->BSRR = (uint32_t)I2C_VCC_PIN << 16U /* VCC = 0 */
 
 #define I2C_WP_1() GPIO_PORT_I2C->BSRR = (uint32_t)I2C_WP_PIN /* WP = 1 */
-#define I2C_WP_0()                                                             \
-  GPIO_PORT_I2C->BSRR = (uint32_t)I2C_WP_PIN << 16U /* WP = 0 */
+#define I2C_WP_0() \
+    GPIO_PORT_I2C->BSRR = (uint32_t)I2C_WP_PIN << 16U /* WP = 0 */
 
 #define I2C_SCL_1() GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SCL_PIN /* SCL = 1 */
-#define I2C_SCL_0()                                                            \
-  GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SCL_PIN << 16U /* SCL = 0 */
+#define I2C_SCL_0() \
+    GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SCL_PIN << 16U /* SCL = 0 */
 
 #define I2C_SDA_1() GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SDA_PIN /* SDA = 1 */
-#define I2C_SDA_0()                                                            \
-  GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SDA_PIN << 16U /* SDA = 0 */
+#define I2C_SDA_0() \
+    GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SDA_PIN << 16U /* SDA = 0 */
 
-#define I2C_WP_READ()                                                          \
-  ((GPIO_PORT_I2C->IDR & I2C_WP_PIN) != 0) /* 读WP口线状态 */
-#define I2C_SDA_READ()                                                         \
-  ((GPIO_PORT_I2C->IDR & I2C_SDA_PIN) != 0) /* 读SDA口线状态 */
-#define I2C_SCL_READ()                                                         \
-  ((GPIO_PORT_I2C->IDR & I2C_SCL_PIN) != 0) /* 读SCL口线状态 */
+#define I2C_WP_READ() \
+    ((GPIO_PORT_I2C->IDR & I2C_WP_PIN) != 0) /* 读WP口线状态 */
+#define I2C_SDA_READ() \
+    ((GPIO_PORT_I2C->IDR & I2C_SDA_PIN) != 0) /* 读SDA口线状态 */
+#define I2C_SCL_READ() \
+    ((GPIO_PORT_I2C->IDR & I2C_SCL_PIN) != 0) /* 读SCL口线状态 */
 
 /*
 *********************************************************************************************************
@@ -79,43 +79,44 @@
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void bsp_InitI2C(void) {
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
+void bsp_InitI2C(void)
+{
+    GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
-  /* GPIO Ports Clock Enable */
-  ALL_I2C_GPIO_CLK_ENABLE();
+    /* GPIO Ports Clock Enable */
+    ALL_I2C_GPIO_CLK_ENABLE();
 
-  /*Configure GPIO pins : PB6 PB7 */
-  GPIO_InitStruct.Pin = I2C_SCL_PIN | I2C_SDA_PIN;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(GPIO_PORT_I2C, &GPIO_InitStruct);
-
-  if (I2C_WP_PIN != -1) {
-    GPIO_InitStruct.Pin = (uint32_t)I2C_WP_PIN;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    /*Configure GPIO pins : PB6 PB7 */
+    GPIO_InitStruct.Pin = I2C_SCL_PIN | I2C_SDA_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     HAL_GPIO_Init(GPIO_PORT_I2C, &GPIO_InitStruct);
-  }
-  if (I2C_VCC_PIN != -1) {
-    GPIO_InitStruct.Pin = (uint32_t)I2C_VCC_PIN;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(GPIO_PORT_VCC, &GPIO_InitStruct);
-  }
 
-  // 默认电源拉低
-  i2c_VCCEnable();
-  /* 发送I2C写禁能信号 */
-  i2c_WPDisable();
-  /* 给一个停止信号, 复位I2C总线上的所有设备到待机模式 */
-  i2c_Stop();
-  /* 检测芯片是否正常 */
-  if (ee_CheckOk() < 0) {
-  }
+    if (I2C_WP_PIN != -1) {
+        GPIO_InitStruct.Pin = (uint32_t)I2C_WP_PIN;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+        GPIO_InitStruct.Pull = GPIO_PULLUP;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+        HAL_GPIO_Init(GPIO_PORT_I2C, &GPIO_InitStruct);
+    }
+    if (I2C_VCC_PIN != -1) {
+        GPIO_InitStruct.Pin = (uint32_t)I2C_VCC_PIN;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+        GPIO_InitStruct.Pull = GPIO_PULLUP;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+        HAL_GPIO_Init(GPIO_PORT_VCC, &GPIO_InitStruct);
+    }
+
+    // 默认电源拉低
+    i2c_VCCEnable();
+    /* 发送I2C写禁能信号 */
+    i2c_WPDisable();
+    /* 给一个停止信号, 复位I2C总线上的所有设备到待机模式 */
+    i2c_Stop();
+    /* 检测芯片是否正常 */
+    if (ee_CheckOk() < 0) {
+    }
 }
 /*
 *********************************************************************************************************
@@ -125,22 +126,23 @@ void bsp_InitI2C(void) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-static void i2c_Delay(void) {
-  __IO uint8_t i;
+static void i2c_Delay(void)
+{
+    __IO uint8_t i;
 
-  /*
-      CPU主频168MHz时，在内部Flash运行, MDK工程不优化。用台式示波器观测波形。
-      循环次数为5时，SCL频率 = 1.78MHz (读耗时: 92ms,
-     读写正常，但是用示波器探头碰上就读写失败。时序接近临界)
-      循环次数为10时，SCL频率 = 1.1MHz (读耗时: 138ms, 读速度: 118724B/s)
-      循环次数为30时，SCL频率 = 440KHz， SCL高电平时间1.0us，SCL低电平时间1.2us
+    /*
+        CPU主频168MHz时，在内部Flash运行, MDK工程不优化。用台式示波器观测波形。
+        循环次数为5时，SCL频率 = 1.78MHz (读耗时: 92ms,
+       读写正常，但是用示波器探头碰上就读写失败。时序接近临界)
+        循环次数为10时，SCL频率 = 1.1MHz (读耗时: 138ms, 读速度: 118724B/s)
+        循环次数为30时，SCL频率 = 440KHz， SCL高电平时间1.0us，SCL低电平时间1.2us
 
-      上拉电阻选择2.2K欧时，SCL上升沿时间约0.5us，如果选4.7K欧，则上升沿约1us
+        上拉电阻选择2.2K欧时，SCL上升沿时间约0.5us，如果选4.7K欧，则上升沿约1us
 
-      实际应用选择400KHz左右的速率即可
-  */
-  for (i = 0; i < 30; i++)
-    ;
+        实际应用选择400KHz左右的速率即可
+    */
+    for (i = 0; i < 30; i++)
+        ;
 }
 /*
 *********************************************************************************************************
@@ -150,11 +152,12 @@ static void i2c_Delay(void) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void i2c_VCCEnable(void) {
-  if (I2C_VCC_PIN != -1) {
-    I2C_VCC_0();
-    i2c_Delay();
-  }
+void i2c_VCCEnable(void)
+{
+    if (I2C_VCC_PIN != -1) {
+        I2C_VCC_0();
+        i2c_Delay();
+    }
 }
 
 /*
@@ -165,11 +168,12 @@ void i2c_VCCEnable(void) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void i2c_VCCDisable(void) {
-  if (I2C_VCC_PIN != -1) {
-    i2c_Delay();
-    I2C_VCC_1();
-  }
+void i2c_VCCDisable(void)
+{
+    if (I2C_VCC_PIN != -1) {
+        i2c_Delay();
+        I2C_VCC_1();
+    }
 }
 /*
 *********************************************************************************************************
@@ -179,11 +183,12 @@ void i2c_VCCDisable(void) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void i2c_WPEnable(void) {
-  if (I2C_WP_PIN != -1) {
-    I2C_WP_0();
-    i2c_Delay();
-  }
+void i2c_WPEnable(void)
+{
+    if (I2C_WP_PIN != -1) {
+        I2C_WP_0();
+        i2c_Delay();
+    }
 }
 
 /*
@@ -194,11 +199,12 @@ void i2c_WPEnable(void) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void i2c_WPDisable(void) {
-  if (I2C_WP_PIN != -1) {
-    i2c_Delay();
-    I2C_WP_1();
-  }
+void i2c_WPDisable(void)
+{
+    if (I2C_WP_PIN != -1) {
+        i2c_Delay();
+        I2C_WP_1();
+    }
 }
 /*
 *********************************************************************************************************
@@ -208,18 +214,19 @@ void i2c_WPDisable(void) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void i2c_Recover(void) {
-  uint8_t i = 0;
+void i2c_Recover(void)
+{
+    uint8_t i = 0;
 
-  for (i = 0; i < 32; i++) {
-    I2C_SCL_0();
-    i2c_Delay();
-    I2C_SCL_1();
-    i2c_Delay();
-    if (I2C_SDA_READ()) {
-      break;
+    for (i = 0; i < 32; i++) {
+        I2C_SCL_0();
+        i2c_Delay();
+        I2C_SCL_1();
+        i2c_Delay();
+        if (I2C_SDA_READ()) {
+            break;
+        }
     }
-  }
 }
 /*
 *********************************************************************************************************
@@ -229,19 +236,20 @@ void i2c_Recover(void) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void i2c_Start(void) {
-  /* 检测IIC是否被锁死 */
-  if (!I2C_SDA_READ()) {
-    i2c_Recover();
-  }
-  /* 当SCL高电平时，SDA出现一个下跳沿表示I2C总线启动信号 */
-  I2C_SDA_1();
-  I2C_SCL_1();
-  i2c_Delay();
-  I2C_SDA_0();
-  i2c_Delay();
-  I2C_SCL_0();
-  i2c_Delay();
+void i2c_Start(void)
+{
+    /* 检测IIC是否被锁死 */
+    if (!I2C_SDA_READ()) {
+        i2c_Recover();
+    }
+    /* 当SCL高电平时，SDA出现一个下跳沿表示I2C总线启动信号 */
+    I2C_SDA_1();
+    I2C_SCL_1();
+    i2c_Delay();
+    I2C_SDA_0();
+    i2c_Delay();
+    I2C_SCL_0();
+    i2c_Delay();
 }
 
 /*
@@ -252,12 +260,13 @@ void i2c_Start(void) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void i2c_Stop(void) {
-  /* 当SCL高电平时，SDA出现一个上跳沿表示I2C总线停止信号 */
-  I2C_SDA_0();
-  I2C_SCL_1();
-  i2c_Delay();
-  I2C_SDA_1();
+void i2c_Stop(void)
+{
+    /* 当SCL高电平时，SDA出现一个上跳沿表示I2C总线停止信号 */
+    I2C_SDA_0();
+    I2C_SCL_1();
+    i2c_Delay();
+    I2C_SDA_1();
 }
 
 /*
@@ -268,26 +277,27 @@ void i2c_Stop(void) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void i2c_SendByte(uint8_t _ucByte) {
-  uint8_t i;
+void i2c_SendByte(uint8_t _ucByte)
+{
+    uint8_t i;
 
-  /* 先发送字节的高位bit7 */
-  for (i = 0; i < 8; i++) {
-    if (_ucByte & 0x80) {
-      I2C_SDA_1();
-    } else {
-      I2C_SDA_0();
+    /* 先发送字节的高位bit7 */
+    for (i = 0; i < 8; i++) {
+        if (_ucByte & 0x80) {
+            I2C_SDA_1();
+        } else {
+            I2C_SDA_0();
+        }
+        i2c_Delay();
+        I2C_SCL_1();
+        i2c_Delay();
+        I2C_SCL_0();
+        if (i == 7) {
+            I2C_SDA_1(); // 释放总线
+        }
+        _ucByte <<= 1; /* 左移一个bit */
+        i2c_Delay();
     }
-    i2c_Delay();
-    I2C_SCL_1();
-    i2c_Delay();
-    I2C_SCL_0();
-    if (i == 7) {
-      I2C_SDA_1(); // 释放总线
-    }
-    _ucByte <<= 1; /* 左移一个bit */
-    i2c_Delay();
-  }
 }
 
 /*
@@ -298,23 +308,24 @@ void i2c_SendByte(uint8_t _ucByte) {
 *   返 回 值: 读到的数据
 *********************************************************************************************************
 */
-uint8_t i2c_ReadByte(void) {
-  uint8_t i;
-  uint8_t value;
+uint8_t i2c_ReadByte(void)
+{
+    uint8_t i;
+    uint8_t value;
 
-  /* 读到第1个bit为数据的bit7 */
-  value = 0;
-  for (i = 0; i < 8; i++) {
-    value <<= 1;
-    I2C_SCL_1();
-    i2c_Delay();
-    if (I2C_SDA_READ()) {
-      value++;
+    /* 读到第1个bit为数据的bit7 */
+    value = 0;
+    for (i = 0; i < 8; i++) {
+        value <<= 1;
+        I2C_SCL_1();
+        i2c_Delay();
+        if (I2C_SDA_READ()) {
+            value++;
+        }
+        I2C_SCL_0();
+        i2c_Delay();
     }
-    I2C_SCL_0();
-    i2c_Delay();
-  }
-  return value;
+    return value;
 }
 
 /*
@@ -325,22 +336,23 @@ uint8_t i2c_ReadByte(void) {
 *   返 回 值: 返回0表示正确应答，1表示无器件响应
 *********************************************************************************************************
 */
-uint8_t i2c_WaitAck(void) {
-  uint8_t re;
+uint8_t i2c_WaitAck(void)
+{
+    uint8_t re;
 
-  I2C_SDA_1(); /* CPU释放SDA总线 */
-  i2c_Delay();
-  I2C_SCL_1(); /* CPU驱动SCL = 1, 此时器件会返回ACK应答 */
-  i2c_Delay();
-  if (I2C_SDA_READ()) /* CPU读取SDA口线状态 */
-  {
-    re = 1;
-  } else {
-    re = 0;
-  }
-  I2C_SCL_0();
-  i2c_Delay();
-  return re;
+    I2C_SDA_1(); /* CPU释放SDA总线 */
+    i2c_Delay();
+    I2C_SCL_1(); /* CPU驱动SCL = 1, 此时器件会返回ACK应答 */
+    i2c_Delay();
+    if (I2C_SDA_READ()) /* CPU读取SDA口线状态 */
+    {
+        re = 1;
+    } else {
+        re = 0;
+    }
+    I2C_SCL_0();
+    i2c_Delay();
+    return re;
 }
 
 /*
@@ -351,14 +363,15 @@ uint8_t i2c_WaitAck(void) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void i2c_Ack(void) {
-  I2C_SDA_0(); /* CPU驱动SDA = 0 */
-  i2c_Delay();
-  I2C_SCL_1(); /* CPU产生1个时钟 */
-  i2c_Delay();
-  I2C_SCL_0();
-  i2c_Delay();
-  I2C_SDA_1(); /* CPU释放SDA总线 */
+void i2c_Ack(void)
+{
+    I2C_SDA_0(); /* CPU驱动SDA = 0 */
+    i2c_Delay();
+    I2C_SCL_1(); /* CPU产生1个时钟 */
+    i2c_Delay();
+    I2C_SCL_0();
+    i2c_Delay();
+    I2C_SDA_1(); /* CPU释放SDA总线 */
 }
 
 /*
@@ -369,13 +382,14 @@ void i2c_Ack(void) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void i2c_NAck(void) {
-  I2C_SDA_1(); /* CPU驱动SDA = 1 */
-  i2c_Delay();
-  I2C_SCL_1(); /* CPU产生1个时钟 */
-  i2c_Delay();
-  I2C_SCL_0();
-  i2c_Delay();
+void i2c_NAck(void)
+{
+    I2C_SDA_1(); /* CPU驱动SDA = 1 */
+    i2c_Delay();
+    I2C_SCL_1(); /* CPU产生1个时钟 */
+    i2c_Delay();
+    I2C_SCL_0();
+    i2c_Delay();
 }
 
 /*
@@ -386,19 +400,20 @@ void i2c_NAck(void) {
 *_Address：设备的I2C总线地址 返 回 值: 返回值 0 表示正确， 返回1表示未探测到
 *********************************************************************************************************
 */
-uint8_t i2c_CheckDevice(uint8_t _Address) {
-  uint8_t ucAck;
+uint8_t i2c_CheckDevice(uint8_t _Address)
+{
+    uint8_t ucAck;
 
-  if (I2C_SDA_READ() && I2C_SCL_READ()) {
-    i2c_Start(); /* 发送启动信号 */
+    if (I2C_SDA_READ() && I2C_SCL_READ()) {
+        i2c_Start(); /* 发送启动信号 */
 
-    /* 发送设备地址+读写控制bit（0 = w， 1 = r) bit7 先传 */
-    i2c_SendByte(_Address | I2C_WR);
-    ucAck = i2c_WaitAck(); /* 检测设备的ACK应答 */
+        /* 发送设备地址+读写控制bit（0 = w， 1 = r) bit7 先传 */
+        i2c_SendByte(_Address | I2C_WR);
+        ucAck = i2c_WaitAck(); /* 检测设备的ACK应答 */
 
-    i2c_Stop(); /* 发送停止信号 */
+        i2c_Stop(); /* 发送停止信号 */
 
-    return ucAck;
-  }
-  return 1; /* I2C总线异常 */
+        return ucAck;
+    }
+    return 1; /* I2C总线异常 */
 }

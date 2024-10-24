@@ -29,58 +29,56 @@
 
 #ifdef AT24C02
 #define EE_MODEL_NAME "AT24C02"
-#define EE_DEV_ADDR 0xA0 /* 设备地址 */
-#define EE_PAGE_SIZE 8   /* 页面大小(字节) */
-#define EE_SIZE 256      /* 总容量(字节) */
-#define EE_ADDR_BYTES 1  /* 地址字节个数 */
+#define EE_DEV_ADDR   0xA0 /* 设备地址 */
+#define EE_PAGE_SIZE  8    /* 页面大小(字节) */
+#define EE_SIZE       256  /* 总容量(字节) */
+#define EE_ADDR_BYTES 1    /* 地址字节个数 */
 #endif
 
 #ifdef AT24C32
 #define EE_MODEL_NAME "AT24C32"
-#define EE_DEV_ADDR 0xA0   /* 设备地址 */
-#define EE_PAGE_SIZE 32    /* 页面大小(字节) */
-#define EE_SIZE (4 * 1024) /* 总容量(字节) */
-#define EE_ADDR_BYTES 2    /* 地址字节个数 */
+#define EE_DEV_ADDR   0xA0       /* 设备地址 */
+#define EE_PAGE_SIZE  32         /* 页面大小(字节) */
+#define EE_SIZE       (4 * 1024) /* 总容量(字节) */
+#define EE_ADDR_BYTES 2          /* 地址字节个数 */
 #endif
 
 #ifdef AT24C64
 #define EE_MODEL_NAME "AT24C64"
-#define EE_DEV_ADDR 0xA0   /* 设备地址 */
-#define EE_PAGE_SIZE 32    /* 页面大小(字节) */
-#define EE_SIZE (8 * 1024) /* 总容量(字节) */
-#define EE_ADDR_BYTES 2    /* 地址字节个数 */
+#define EE_DEV_ADDR   0xA0       /* 设备地址 */
+#define EE_PAGE_SIZE  32         /* 页面大小(字节) */
+#define EE_SIZE       (8 * 1024) /* 总容量(字节) */
+#define EE_ADDR_BYTES 2          /* 地址字节个数 */
 #endif
 
 #ifdef AT24C128
 #define EE_MODEL_NAME "AT24C128"
-#define EE_DEV_ADDR 0xA0    /* 设备地址 */
-#define EE_PAGE_SIZE 64     /* 页面大小(字节) */
-#define EE_SIZE (16 * 1024) /* 总容量(字节) */
-#define EE_ADDR_BYTES 2     /* 地址字节个数 */
+#define EE_DEV_ADDR   0xA0        /* 设备地址 */
+#define EE_PAGE_SIZE  64          /* 页面大小(字节) */
+#define EE_SIZE       (16 * 1024) /* 总容量(字节) */
+#define EE_ADDR_BYTES 2           /* 地址字节个数 */
 #endif
 
 #ifdef AT24C256
 #define EE_MODEL_NAME "AT24C256"
-#define EE_DEV_ADDR 0xA0    /* 设备地址 */
-#define EE_PAGE_SIZE 64     /* 页面大小(字节) */
-#define EE_SIZE (32 * 1024) /* 总容量(字节) */
-#define EE_ADDR_BYTES 2     /* 地址字节个数 */
+#define EE_DEV_ADDR   0xA0        /* 设备地址 */
+#define EE_PAGE_SIZE  64          /* 页面大小(字节) */
+#define EE_SIZE       (32 * 1024) /* 总容量(字节) */
+#define EE_ADDR_BYTES 2           /* 地址字节个数 */
 #endif
 
 #ifdef AT24C512
 #define EE_MODEL_NAME "AT24C512"
-#define EE_DEV_ADDR 0xA0    /* 设备地址 */
-#define EE_PAGE_SIZE 128    /* 页面大小(字节) */
-#define EE_SIZE (64 * 1024) /* 总容量(字节) */
-#define EE_ADDR_BYTES 2     /* 地址字节个数 */
+#define EE_DEV_ADDR   0xA0        /* 设备地址 */
+#define EE_PAGE_SIZE  128         /* 页面大小(字节) */
+#define EE_SIZE       (64 * 1024) /* 总容量(字节) */
+#define EE_ADDR_BYTES 2           /* 地址字节个数 */
 #endif
 
 int32_t ee_CheckOk(void);
 int32_t ee_ReadBytes(uint8_t *_pReadBuf, uint16_t _usAddress, uint16_t _usSize);
-int32_t ee_WriteBytes(uint8_t *_pWriteBuf, uint16_t _usAddress,
-                      uint16_t _usSize);
-int32_t ee_CompareBytes(uint8_t *_pCompareBuf, uint16_t _usAddress,
-                        uint16_t _usSize);
+int32_t ee_WriteBytes(uint8_t *_pWriteBuf, uint16_t _usAddress, uint16_t _usSize);
+int32_t ee_CompareBytes(uint8_t *_pCompareBuf, uint16_t _usAddress, uint16_t _usSize);
 
 #endif
 

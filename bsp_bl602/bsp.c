@@ -4,7 +4,7 @@
  * @Author       : lxf
  * @Date         : 2024-10-22 14:01:20
  * @LastEditors  : flyyingpiggy2020 154562451@qq.com
- * @LastEditTime : 2024-10-22 14:01:22
+ * @LastEditTime : 2024-10-26 11:20:11
  * @Brief        :
  */
 
@@ -17,8 +17,16 @@
 /*---------- function prototype ----------*/
 /*---------- variable ----------*/
 /*---------- function ----------*/
-void bsp_Init(void)
+int bsp_Init(void)
 {
     bsp_InitUart(); /* 串口初始化 */
+    return 0;
 }
+
+#if defined(CONF_FPSDK_ENABLE_EXPORT)
+#include "export.h"
+INIT_BOARD_EXPORT(bsp_Init);
+#endif
+
+
 /*---------- end of file ----------*/

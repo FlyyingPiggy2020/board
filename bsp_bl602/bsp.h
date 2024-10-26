@@ -4,7 +4,7 @@
  * @Author       : lxf
  * @Date         : 2024-10-21 16:11:43
  * @LastEditors  : flyyingpiggy2020 154562451@qq.com
- * @LastEditTime : 2024-10-22 14:02:29
+ * @LastEditTime : 2024-10-25 13:57:36
  * @Brief        :
  */
 
@@ -18,6 +18,6 @@
 /*---------- variable prototype ----------*/
 /*---------- function prototype ----------*/
 
-void bsp_Init(void);
+int bsp_Init(void);
 /*---------- end of file ----------*/
 #endif

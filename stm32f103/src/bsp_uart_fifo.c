@@ -350,6 +350,7 @@ UART_T *comTxToUart(USART_TypeDef *_uart)
 *   返 回 值: 无
 *********************************************************************************************************
 */
+
 int32_t comSendBuf(COM_PORT_E _ucPort, uint8_t *_ucaBuf, uint16_t _usLen)
 {
     UART_T *pUart;
@@ -361,12 +362,10 @@ int32_t comSendBuf(COM_PORT_E _ucPort, uint8_t *_ucaBuf, uint16_t _usLen)
 
     if (pUart->SendBefor != 0) {
         pUart->SendBefor(
-            pUart
-                ->com); /* 如果是RS485通信，可以在这个函数中将RS485设置为发送模式 */
+            pUart->com); /* 如果是RS485通信，可以在这个函数中将RS485设置为发送模式 */
     }
 
     return UartSend(pUart, _ucaBuf, _usLen);
-    ;
 }
 
 /*

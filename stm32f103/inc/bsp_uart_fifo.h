@@ -132,18 +132,11 @@ typedef struct {
     __IO uint16_t usRxRead;  /* 接收缓冲区读指针 */
     __IO uint16_t usRxCount; /* 还未读取的新数据个数 */
 
-    void (*SendBefor)(
-        COM_PORT_E
-            com); /* 开始发送之前的回调函数指针（主要用于RS485切换到发送模式）
-                   */
-    void (*SendOver)(
-        COM_PORT_E
-            com); /* 发送完毕的回调函数指针（主要用于RS485将发送模式切换为接收模式）
-                   */
-    void (*ReciveNew)(COM_PORT_E com,
-                      uint8_t _byte); /* 串口收到数据的回调函数指针 */
-    void (*IdleCallback)(void);       /* 空闲中断回调 */
-    uint8_t Sending;                  /* 正在发送中 */
+    void (*SendBefor)(COM_PORT_E com);                /* 开始发送之前的回调函数指针（主要用于RS485切换到发送模式）*/
+    void (*SendOver)(COM_PORT_Ecom);                  /* 发送完毕的回调函数指针（主要用于RS485将发送模式切换为接收模式）*/
+    void (*ReciveNew)(COM_PORT_E com, uint8_t _byte); /* 串口收到数据的回调函数指针 */
+    void (*IdleCallback)(void);                       /* 空闲中断回调 */
+    uint8_t Sending;                                  /* 正在发送中 */
 } UART_T;
 
 void bsp_InitUart(void);

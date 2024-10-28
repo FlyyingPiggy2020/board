@@ -28,5 +28,4 @@ int bsp_Init(void)
 INIT_BOARD_EXPORT(bsp_Init);
 #endif
 
-
 /*---------- end of file ----------*/

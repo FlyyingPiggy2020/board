@@ -4,7 +4,7 @@
  * @Author       : lxf
  * @Date         : 2024-10-22 14:01:20
  * @LastEditors  : flyyingpiggy2020 154562451@qq.com
- * @LastEditTime : 2024-10-26 11:20:11
+ * @LastEditTime : 2024-10-28 19:10:56
  * @Brief        :
  */
 
@@ -20,6 +20,7 @@
 int bsp_Init(void)
 {
     bsp_InitUart(); /* 串口初始化 */
+    bsp_InitBle();  /* 蓝牙初始化 */
     return 0;
 }
 

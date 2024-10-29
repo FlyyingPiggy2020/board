@@ -13,10 +13,7 @@
 /*---------- includes ----------*/
 #include <bl_uart.h>
 #include <hosal_uart.h>
-#include "FreeRTOS.h"
-#include <task.h>
-#include <timers.h>
-#include <semphr.h>
+
 /*---------- macro ----------*/
 
 // BL602有两个端口，端口0和端口1.

@@ -1,29 +1,24 @@
 /*
  * Copyright (c) 2024 by Lu Xianfan.
- * @FilePath     : bsp.h
+ * @FilePath     : bsp_ble.h
  * @Author       : lxf
- * @Date         : 2024-10-21 16:11:43
+ * @Date         : 2024-10-28 19:01:47
  * @LastEditors  : flyyingpiggy2020 154562451@qq.com
- * @LastEditTime : 2024-10-28 19:11:38
- * @Brief        :
+ * @LastEditTime : 2024-10-28 19:04:08
+ * @Brief        : 博流蓝牙设备驱动
  */
 
-#ifndef __BSP_H__
-#define __BSP_H__
+#ifndef __BSP_BLE_H__
+#define __BSP_BLE_H__
 /*---------- includes ----------*/
-#include "FreeRTOS.h"
-#include <task.h>
-#include <timers.h>
-#include <semphr.h>
 
-#include "bsp_config.h"
-#include "bsp_uart_fifo.h"
-#include "bsp_ble.h"
+
 /*---------- macro ----------*/
 /*---------- type define ----------*/
 /*---------- variable prototype ----------*/
 /*---------- function prototype ----------*/
-
-int bsp_Init(void);
+void bsp_InitBle(void);
 /*---------- end of file ----------*/
-#endif
+#endif // !__BSP_BLE_H__
+
+

@@ -4,13 +4,13 @@
  * @Author       : lxf
  * @Date         : 2024-10-21 16:14:42
  * @LastEditors  : flyyingpiggy2020 154562451@qq.com
- * @LastEditTime : 2024-10-28 14:44:04
+ * @LastEditTime : 2024-10-30 15:20:50
  * @Brief        :
  * 1.uart0尽量不用：BL602拥有两个串口uart0,uart1，其中uart0用于log输出，不可用。
  * 2.串口阻塞：在RTOS中使用，我们希望底层的接口是阻塞的。这样子加了互斥之后才会起到作用。
  * 3.模拟空闲中断：利用软件定时器实现串口空闲，默认按照3.5字节去计算，最小值为2ms(因为软件定时器是毫秒级的)
  * 利用一个二值信号量通知任务去处理数据
- * 
+ *
  */
 
 /*---------- includes ----------*/
@@ -126,8 +126,11 @@ void bsp_InitUart(void)
     hosal_uart_init(&uart_dev_int1);
     hosal_uart_ioctl(&uart_dev_int1, HOSAL_UART_MODE_SET, (void *)HOSAL_UART_MODE_INT);
     hosal_uart_callback_set(&uart_dev_int1, HOSAL_UART_RX_CALLBACK, __uart1_rx_callback, &g_tUart1);
-    printf("uart1 init success:\nbaud_rate=%d\ntimeout=%d(ms)\nrxio:%d\ntxio:%d\r\n", 
-        UART1_BAUD, calc_uart_timeout(UART1_BAUD),USART1_RX_PIN,USART1_TX_PIN);
+    printf("uart1 init success:\r\nbaud_rate=%d\r\ntimeout=%d(ms)\r\nrxio:%d\r\ntxio:%d\r\n",
+           UART1_BAUD,
+           calc_uart_timeout(UART1_BAUD),
+           USART1_RX_PIN,
+           USART1_TX_PIN);
 #endif
 
 #if UART2_FIFO_EN == 1
@@ -148,8 +151,11 @@ void bsp_InitUart(void)
     hosal_uart_init(&uart_dev_int2);
     hosal_uart_ioctl(&uart_dev_int2, HOSAL_UART_MODE_SET, (void *)HOSAL_UART_MODE_INT);
     hosal_uart_callback_set(&uart_dev_int2, HOSAL_UART_RX_CALLBACK, __uart2_rx_callback, &g_tUart2);
-    printf("uart2 init success:\nbaud_rate=%d\ntimeout=%d(ms)\nrxio:%d\ntxio:%d\r\n", 
-        UART2_BAUD, calc_uart_timeout(UART2_BAUD),USART2_RX_PIN,USART2_TX_PIN);
+    printf("uart2 init success:\r\nbaud_rate=%d\r\ntimeout=%d(ms)\r\nrxio:%d\r\ntxio:%d\r\n",
+           UART2_BAUD,
+           calc_uart_timeout(UART2_BAUD),
+           USART2_RX_PIN,
+           USART2_TX_PIN);
 #endif
     return;
 }

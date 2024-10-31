@@ -12,7 +12,6 @@
 #define __BSP_BLE_H__
 /*---------- includes ----------*/
 
-
 /*---------- macro ----------*/
 /*---------- type define ----------*/
 /*---------- variable prototype ----------*/
@@ -20,5 +19,3 @@
 void bsp_InitBle(void);
 /*---------- end of file ----------*/
 #endif // !__BSP_BLE_H__
-
-

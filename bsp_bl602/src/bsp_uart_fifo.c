@@ -4,7 +4,7 @@
  * @Author       : lxf
  * @Date         : 2024-10-21 16:14:42
  * @LastEditors  : flyyingpiggy2020 154562451@qq.com
- * @LastEditTime : 2024-10-30 15:20:50
+ * @LastEditTime : 2024-11-06 11:41:08
  * @Brief        :
  * 1.uart0尽量不用：BL602拥有两个串口uart0,uart1，其中uart0用于log输出，不可用。
  * 2.串口阻塞：在RTOS中使用，我们希望底层的接口是阻塞的。这样子加了互斥之后才会起到作用。
@@ -123,6 +123,7 @@ void bsp_InitUart(void)
     g_tUart1.usTxCount = 0;                   /* 待发送的数据个数 */
     g_tUart1.rto = xTimerCreate("rto_u1", pdMS_TO_TICKS(calc_uart_timeout(UART1_BAUD)), pdFALSE, (void *const)COM1, uart_idle_handler);
     g_tUart1.idle = xSemaphoreCreateBinary();
+    g_tUart1.mutex = xSemaphoreCreateMutex();
     hosal_uart_init(&uart_dev_int1);
     hosal_uart_ioctl(&uart_dev_int1, HOSAL_UART_MODE_SET, (void *)HOSAL_UART_MODE_INT);
     hosal_uart_callback_set(&uart_dev_int1, HOSAL_UART_RX_CALLBACK, __uart1_rx_callback, &g_tUart1);
@@ -148,6 +149,7 @@ void bsp_InitUart(void)
     g_tUart2.usTxCount = 0;                   /* 待发送的数据个数 */
     g_tUart2.rto = xTimerCreate("rto_u2", pdMS_TO_TICKS(calc_uart_timeout(UART2_BAUD)), pdFALSE, (void *const)COM2, uart_idle_handler);
     g_tUart2.idle = xSemaphoreCreateBinary();
+    g_tUart1.mutex = xSemaphoreCreateMutex();
     hosal_uart_init(&uart_dev_int2);
     hosal_uart_ioctl(&uart_dev_int2, HOSAL_UART_MODE_SET, (void *)HOSAL_UART_MODE_INT);
     hosal_uart_callback_set(&uart_dev_int2, HOSAL_UART_RX_CALLBACK, __uart2_rx_callback, &g_tUart2);
@@ -200,14 +202,16 @@ int32_t comSendBuf(COM_PORT_E _ucPort, uint8_t *_ucaBuf, uint16_t _usLen)
     if (pUart == 0) {
         return -1;
     }
+    xSemaphoreTake(pUart->mutex, portMAX_DELAY);
     if (pUart->SendBefor != 0) {
-        pUart->SendBefor(pUart->com); /* 如果是RS485通信，可以在这个函数中将RS485设置为发送模式 */
+        pUart->SendBefor(pUart->com);
     }
     ret = hosal_uart_send(pUart->uart, _ucaBuf, _usLen);
-    hosal_uart_ioctl(pUart->uart, HOSAL_UART_FLUSH, NULL);
+    hosal_uart_ioctl(pUart->uart, HOSAL_UART_FLUSH, NULL); //阻塞发送
     if (pUart->SendOver != 0) {
-        pUart->SendOver(pUart->com); /* 如果是RS485通信，可以在这个函数中将RS485设置为接收模式 */
+        pUart->SendOver(pUart->com);
     }
+    xSemaphoreGive(pUart->mutex);
     return ret;
 }
 
@@ -224,7 +228,6 @@ static uint16_t UartGetBuf(UART_T *_pUart, uint8_t *_ucaBuf, uint16_t _usLen)
     bl_uart_int_rx_enable(id);
 
     /* 如果读和写索引相同，则返回0 */
-    // if (_pUart->usRxRead == usRxWrite)
     if (usCount == 0) /* 已经没有数据 */
     {
         return 0;

@@ -4,7 +4,7 @@
  * @Author       : lxf
  * @Date         : 2024-10-21 16:06:54
  * @LastEditors  : flyyingpiggy2020 154562451@qq.com
- * @LastEditTime : 2024-10-28 14:45:17
+ * @LastEditTime : 2024-11-06 11:03:23
  * @Brief        :
  */
 
@@ -60,8 +60,9 @@ typedef struct {
 
     void (*SendBefor)(COM_PORT_E com);
     void (*SendOver)(COM_PORT_E com);
-    TimerHandle_t rto;      /* 接收超时定时器(模拟idle中断) */
-    SemaphoreHandle_t idle; /* idle空闲中断 */
+    TimerHandle_t rto;       /* 接收超时定时器(模拟idle中断) */
+    SemaphoreHandle_t idle;  /* idle空闲中断 */
+    SemaphoreHandle_t mutex; /* 互斥锁 */
     // void (*ReciveNew)(COM_PORT_E com, uint8_t _byte);
     // void (*IdleCallback)(void);
     // uint8_t Sending;                  /* 正在发送中 */

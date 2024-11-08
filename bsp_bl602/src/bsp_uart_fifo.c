@@ -4,7 +4,7 @@
  * @Author       : lxf
  * @Date         : 2024-10-21 16:14:42
  * @LastEditors  : flyyingpiggy2020 154562451@qq.com
- * @LastEditTime : 2024-11-06 11:41:08
+ * @LastEditTime : 2024-11-08 16:42:55
  * @Brief        :
  * 1.uart0尽量不用：BL602拥有两个串口uart0,uart1，其中uart0用于log输出，不可用。
  * 2.串口阻塞：在RTOS中使用，我们希望底层的接口是阻塞的。这样子加了互斥之后才会起到作用。
@@ -149,7 +149,7 @@ void bsp_InitUart(void)
     g_tUart2.usTxCount = 0;                   /* 待发送的数据个数 */
     g_tUart2.rto = xTimerCreate("rto_u2", pdMS_TO_TICKS(calc_uart_timeout(UART2_BAUD)), pdFALSE, (void *const)COM2, uart_idle_handler);
     g_tUart2.idle = xSemaphoreCreateBinary();
-    g_tUart1.mutex = xSemaphoreCreateMutex();
+    g_tUart2.mutex = xSemaphoreCreateMutex();
     hosal_uart_init(&uart_dev_int2);
     hosal_uart_ioctl(&uart_dev_int2, HOSAL_UART_MODE_SET, (void *)HOSAL_UART_MODE_INT);
     hosal_uart_callback_set(&uart_dev_int2, HOSAL_UART_RX_CALLBACK, __uart2_rx_callback, &g_tUart2);
@@ -203,12 +203,12 @@ int32_t comSendBuf(COM_PORT_E _ucPort, uint8_t *_ucaBuf, uint16_t _usLen)
         return -1;
     }
     xSemaphoreTake(pUart->mutex, portMAX_DELAY);
-    if (pUart->SendBefor != 0) {
+    if (pUart->SendBefor != NULL) {
         pUart->SendBefor(pUart->com);
     }
     ret = hosal_uart_send(pUart->uart, _ucaBuf, _usLen);
     hosal_uart_ioctl(pUart->uart, HOSAL_UART_FLUSH, NULL); //阻塞发送
-    if (pUart->SendOver != 0) {
+    if (pUart->SendOver != NULL) {
         pUart->SendOver(pUart->com);
     }
     xSemaphoreGive(pUart->mutex);

@@ -1,0 +1,124 @@
+menu "STM32F103 BOARD"
+    menu "UART Configuration"
+    # UART1 Configuration
+    config BSP_UART1_EN
+        bool "Enable UART1"
+        default y
+        help 
+            Enable UART1 for communication
+        
+        if BSP_UART1_EN
+        config BSP_UART1_BAUD
+            int "UART1 Baudrate"
+            default 115200
+            help 
+                Select the baudrate for UART1
+
+        config BSP_UART1_TX_BUF_SIZE
+            int "UART1 TX Buffer Size"
+            default 512
+            help
+                Select the TX buffer size for UART1
+
+        config BSP_UART1_RX_BUF_SIZE
+            int "UART1 RX Buffer Size"
+            default 512
+            help 
+                Select the RX buffer size for UART1
+
+        config BSP_USART1_TX_IO
+            string "UART1 TX GPIO"
+            default "A.09"
+            help
+                Select the TX GPIO for UART1
+
+        config BSP_USART1_RX_IO
+            string "UART1 RX GPIO"
+            default "A.10"
+            help
+                Select the RX GPIO for UART1
+        endif
+
+    # UART2 Configuration
+    config BSP_UART2_EN
+        bool "Enable UART2"
+        default n
+        help 
+            Enable UART2 for communication
+        
+        if BSP_UART2_EN
+        config BSP_UART2_BAUD
+            int "UART2 Baudrate"
+            default 115200
+            help 
+                Select the baudrate for UART2
+
+        config BSP_UART2_TX_BUF_SIZE
+            int "UART2 TX Buffer Size"
+            default 512
+            help
+                Select the TX buffer size for UART2
+
+        config BSP_UART2_RX_BUF_SIZE
+            int "UART2 RX Buffer Size"
+            default 512
+            help 
+                Select the RX buffer size for UART2
+
+        config BSP_USART2_TX_IO
+            string "UART2 TX GPIO"
+            default "A.02"
+            help
+                Select the TX GPIO for UART2
+
+        config BSP_USART2_RX_IO
+            string "UART2 RX GPIO"
+            default "A.03"
+            help
+                Select the RX GPIO for UART2
+        endif
+
+    # UART3 Configuration
+    config BSP_UART3_EN
+        bool "Enable UART3"
+        default n
+        help 
+            Enable UART3 for communication
+        
+        if BSP_UART3_EN
+        config BSP_UART3_BAUD
+            int "UART3 Baudrate"
+            default 115200
+            help 
+                Select the baudrate for UART2
+
+        config BSP_UART3_TX_BUF_SIZE
+            int "UART3 TX Buffer Size"
+            default 512
+            help
+                Select the TX buffer size for UART3
+
+        config BSP_UART3_RX_BUF_SIZE
+            int "UART3 RX Buffer Size"
+            default 512
+            help 
+                Select the RX buffer size for UART3
+
+        config BSP_USART3_TX_IO
+            string "UART3 TX GPIO"
+            default "B.10"
+            help
+                Select the TX GPIO for UART3
+
+        config BSP_USART3_RX_IO
+            string "UART3 RX GPIO"
+            default "B.11"
+            help
+                Select the RX GPIO for UART3
+        endif
+    endmenu
+
+    menu "ADC Configuration"
+    endmenu
+    
+endmenu

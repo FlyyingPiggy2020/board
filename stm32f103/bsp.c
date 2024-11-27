@@ -33,6 +33,7 @@
 */
 void bsp_Init(void)
 {
+    bsp_InitTimer();
     bsp_InitUart(); /* 串口初始化 */
     bsp_InitLed();  /* 初始化LED */
     bsp_InitI2C();  /* 初始化I2C */

@@ -39,7 +39,7 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdbool.h>
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -66,10 +66,9 @@ void bsp_Idle(void);
 
 void bsp_GetCpuID(uint32_t *_id);
 void bsp_Error_Handler(char *file, uint32_t line);
+bool _translate_pin_name(const char *name, GPIO_TypeDef **tx_port, uint32_t *tx_pin);
+
 #ifdef __cplusplus
 }
 #endif
 #endif
-
-/***************************** 安富莱电子 www.armfly.com (END OF FILE)
- * *********************************/

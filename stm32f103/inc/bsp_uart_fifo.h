@@ -4,7 +4,7 @@
  * @Author       : lxf
  * @Date         : 2024-11-26 13:18:49
  * @LastEditors  : FlyyingPiggy2020 154562451@qq.com
- * @LastEditTime : 2024-11-26 17:00:11
+ * @LastEditTime : 2024-11-27 17:07:08
  * @Brief        :
  */
 
@@ -15,14 +15,6 @@
 
 /*---------- macro ----------*/
 
-#define RS485_TXEN_PIN               GPIO_PIN_1
-/* PB2 控制RS485芯片的发送使能 */
-#define RS485_TXEN_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
-#define RS485_TXEN_GPIO_PORT         GPIOA
-
-#define RS485_RX_EN() \
-    RS485_TXEN_GPIO_PORT->BSRR = (uint32_t)RS485_TXEN_PIN << 16U
-#define RS485_TX_EN() RS485_TXEN_GPIO_PORT->BSRR = RS485_TXEN_PIN
 /*---------- type define ----------*/
 
 /* 定义端口号 */
@@ -53,16 +45,11 @@ typedef struct {
     __IO uint16_t usRxRead;  /* 接收缓冲区读指针 */
     __IO uint16_t usRxCount; /* 还未读取的新数据个数 */
 
-    void (*SendBefor)(
-        COM_PORT_E
-            com); /* 开始发送之前的回调函数指针（主要用于RS485切换到发送模式）*/
-    void (*SendOver)(
-        COM_PORT_E
-            com); /* 发送完毕的回调函数指针（主要用于RS485将发送模式切换为接收模式）*/
-    void (*ReciveNew)(COM_PORT_E com,
-                      uint8_t _byte); /* 串口收到数据的回调函数指针 */
-    void (*IdleCallback)(void);       /* 空闲中断回调 */
-    uint8_t Sending;                  /* 正在发送中 */
+    void (*SendBefor)(COM_PORT_E com);                /* 开始发送之前的回调函数指针（主要用于RS485切换到发送模式）*/
+    void (*SendOver)(COM_PORT_E com);                 /* 发送完毕的回调函数指针（主要用于RS485将发送模式切换为接收模式）*/
+    void (*ReciveNew)(COM_PORT_E com, uint8_t _byte); /* 串口收到数据的回调函数指针 */
+    void (*IdleCallback)(void);                       /* 空闲中断回调 */
+    uint8_t Sending;                                  /* 正在发送中 */
 } UART_T;
 
 /*---------- variable prototype ----------*/

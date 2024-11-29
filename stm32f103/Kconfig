@@ -37,6 +37,26 @@ menu "STM32F103 BOARD"
             default "A.10"
             help
                 Select the RX GPIO for UART1
+
+        config BSP_USART1_485_EN
+            bool "UART1 485 Enable"
+            default n
+            help
+                Enable UART1 485 mod
+            if BSP_USART1_485_EN
+            config BSP_USART1_485_TXE_IO
+                string "UART1 485 TXE GPIO"
+                default "B.02"
+                help
+                    Select the TX GPIO for UART1 485
+            
+            config BSP_USART1_485_TX_EN_LEVEL
+                int "UART1 485 TX Enable Level"
+                default 1
+                range 0 1
+                help
+                    Select the TX enable level for UART1 485
+            endif
         endif
 
     # UART2 Configuration
@@ -121,4 +141,37 @@ menu "STM32F103 BOARD"
     menu "ADC Configuration"
     endmenu
     
+    menu "KEY Configuration"
+        config BSP_HARD_KEY_NUM
+            int "Number of Hard Keys"
+            default 1
+            range 0 1
+            help 
+                This option sets the number of phyiscal keys in the system.
+        config BSP_KEYFILTER_TIME
+            int "Key Filter Time. unit:10ms"
+            default 5
+            range 0 10
+            help 
+                This option sets the key filter time.
+        config BSP_KEY_LONG_TIME
+            int "Key Long Time. unit:10ms"
+            default 500
+            range 0 1000
+            help
+                This option sets the key long time.
+    
+        if BSP_HARD_KEY_NUM >= 1
+            config BSP_KEY1_IO
+                string "GPIO for Key 1"
+                default "A.01"
+                help 
+                    Select the GPIO for key 1
+            config BSP_KEY1_ACTIVE_LEVEL
+                int "Active Level for Key 1"
+                default 1
+                help 
+                    Select the active level for key.0 means low active, 1 means high active.
+        endif
+    endmenu
 endmenu

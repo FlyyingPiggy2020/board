@@ -15,25 +15,8 @@
 #define __BSP_KEY_H
 
 #include "stdint.h"
-
-/* 根据应用程序的功能重命名按键宏 */
-#define KEY_DOWN_K1 KEY_1_DOWN
-#define KEY_UP_K1   KEY_1_UP
-#define KEY_LONG_K1 KEY_1_LONG
-
-/* 按键ID, 主要用于bsp_KeyState()函数的入口参数 */
-typedef enum {
-    KID_L1 = 0,
-    KID_NUM,
-} KEY_ID_E;
-
-/*
-    按键滤波时间50ms, 单位10ms。
-    只有连续检测到50ms状态不变才认为有效，包括弹起和按下两种事件
-    即使按键电路不做硬件滤波，该滤波机制也可以保证可靠地检测到按键事件
-*/
-#define KEY_FILTER_TIME 5
-#define KEY_LONG_TIME   500 /* 单位10ms， 持续1秒，认为长按事件 */
+#define KEY_FILTER_TIME CONFIG_BSP_KEYFILTER_TIME /* 单位10ms, 滤波时长 */
+#define KEY_LONG_TIME   CONFIG_BSP_KEY_LONG_TIME /* 单位10ms， 认为长按事件 */
 
 /*
     每个按键对应1个全局的结构体变量。
@@ -50,19 +33,13 @@ typedef struct {
     uint8_t RepeatCount; /* 连续按键计数器 */
 } KEY_T;
 
-/*
-    定义键值代码, 必须按如下次序定时每个键的按下、弹起和长按事件
-
-    推荐使用enum, 不用#define，原因：
-    (1) 便于新增键值,方便调整顺序，使代码看起来舒服点
-    (2) 编译器可帮我们避免键值重复。
-*/
 typedef enum {
     KEY_NONE = 0, /* 0 表示按键事件 */
-
+#if (CONFIG_BSP_HARD_KEY_NUM >= 1)
     KEY_1_DOWN, /* 1键按下 */
     KEY_1_UP,   /* 1键弹起 */
     KEY_1_LONG, /* 1键长按 */
+#endif
 } KEY_ENUM;
 
 /* 按键FIFO用到变量 */
@@ -80,11 +57,7 @@ void bsp_KeyScan10ms(void);
 void bsp_PutKey(uint8_t _KeyCode);
 uint8_t bsp_GetKey(void);
 uint8_t bsp_GetKey2(void);
-uint8_t bsp_GetKeyState(KEY_ID_E _ucKeyID);
 void bsp_SetKeyParam(uint8_t _ucKeyID, uint16_t _LongTime, uint8_t _RepeatSpeed);
 void bsp_ClearKey(void);
 
 #endif
-
-/***************************** 安富莱电子 www.armfly.com (END OF FILE)
- * *********************************/

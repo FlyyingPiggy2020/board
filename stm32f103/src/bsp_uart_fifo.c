@@ -4,7 +4,7 @@
  * @Author       : lxf
  * @Date         : 2024-11-26 15:36:00
  * @LastEditors  : FlyyingPiggy2020 154562451@qq.com
- * @LastEditTime : 2024-11-27 08:15:40
+ * @LastEditTime : 2024-11-29 08:27:20
  * @Brief        : stm32f103串口驱动程序
  * 更新日志：
  * 2024-11-26   lxf     魔改自安富莱串口驱动程序，支持了通过字符串配置串口
@@ -35,12 +35,15 @@ static uint8_t g_TxBuf3[CONFIG_BSP_UART3_TX_BUF_SIZE]; /* 发送缓冲区 */
 static uint8_t g_RxBuf3[CONFIG_BSP_UART3_RX_BUF_SIZE]; /* 接收缓冲区 */
 #endif
 
-static GPIO_TypeDef *gpio_table[] = {
-    GPIOA,
-    GPIOB,
-    GPIOC,
-    GPIOD,
-};
+#if CONFIG_BSP_USART1_485_EN == 1
+#endif
+
+#if CONFIG_BSP_USART2_485_EN == 1
+#endif
+
+#if CONFIG_BSP_USART3_485_EN == 1
+#endif
+
 /*---------- function prototype ----------*/
 static void UartVarInit(void);
 static void InitHardUart(void);
@@ -299,27 +302,48 @@ void comSetBaud(COM_PORT_E _ucPort, uint32_t _BaudRate)
     comSetUartParam(USARTx, _BaudRate, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX);
 }
 
+static bool _rs485_txe_init(const char *name)
+{
+    GPIO_InitTypeDef gpio_init;
+    GPIO_TypeDef *io_port;
+    uint32_t io_pin;
+
+    if (!_translate_pin_name(name, &io_port, &io_pin)) {
+        return false;
+    }
+
+    /* 配置引脚为推挽输出 */
+    gpio_init.Mode = GPIO_MODE_OUTPUT_PP;   /* 推挽输出 */
+    gpio_init.Pull = GPIO_NOPULL;           /* 上下拉电阻不使能 */
+    gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
+    gpio_init.Pin = io_pin;
+    HAL_GPIO_Init(io_port, &gpio_init);
+    return true;
+}
 /**
  * @brief 配置485发送使能
  * @return {*}
  */
 void RS485_InitTXE(void)
 {
-#if UART6_FIFO_EN == 1
-    GPIO_InitTypeDef gpio_init;
-
-    /* 打开GPIO时钟 */
-    RS485_TXEN_GPIO_CLK_ENABLE();
-
-    /* 配置引脚为推挽输出 */
-    gpio_init.Mode = GPIO_MODE_OUTPUT_PP;   /* 推挽输出 */
-    gpio_init.Pull = GPIO_NOPULL;           /* 上下拉电阻不使能 */
-    gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
-    gpio_init.Pin = RS485_TXEN_PIN;
-    HAL_GPIO_Init(RS485_TXEN_GPIO_PORT, &gpio_init);
+#if CONFIG_BSP_USART1_485_EN == 1
+    _rs485_txe_init(CONFIG_BSP_USART1_485_TXE_IO);
 #endif
 }
 
+void RS485_TX_EN(COM_PORT_E com)
+{
+    if (com == COM3) {
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_RESET);
+    }
+}
+
+void RS485_RX_EN(COM_PORT_E com)
+{
+    if (com == COM3) {
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_SET);
+    }
+}
 /**
  * @brief 修改串口的波特率。
  * @param {COM_PORT_E} _ucPort
@@ -338,9 +362,7 @@ void RS485_SetBaud(COM_PORT_E _ucPort, uint32_t _baud)
  */
 void RS485_SendBefor(COM_PORT_E com)
 {
-    if (com == COM6) {
-        RS485_TX_EN(); /* 切换RS485收发芯片为发送模式 */
-    }
+    RS485_TX_EN(com); /* 切换RS485收发芯片为发送模式 */
 }
 
 /**
@@ -350,9 +372,7 @@ void RS485_SendBefor(COM_PORT_E com)
  */
 void RS485_SendOver(COM_PORT_E com)
 {
-    if (com == COM6) {
-        RS485_RX_EN(); /* 切换RS485收发芯片为接收模式 */
-    }
+    RS485_RX_EN(com); /* 切换RS485收发芯片为接收模式 */
 }
 
 /*
@@ -378,8 +398,8 @@ static void UartVarInit(void)
     g_tUart1.usRxRead = 0;                               /* 接收FIFO读索引 */
     g_tUart1.usRxCount = 0;                              /* 接收到的新数据个数 */
     g_tUart1.usTxCount = 0;                              /* 待发送的数据个数 */
-    g_tUart1.SendBefor = 0;                              /* 发送数据前的回调函数 */
-    g_tUart1.SendOver = 0;                               /* 发送完毕后的回调函数 */
+    g_tUart1.SendBefor = RS485_SendBefor;                /* 发送数据前的回调函数 */
+    g_tUart1.SendOver = RS485_SendOver;                  /* 发送完毕后的回调函数 */
     g_tUart1.ReciveNew = 0;                              /* 接收到新数据后的回调函数 */
     g_tUart1.Sending = 0;                                /* 正在发送中标志 */
     g_tUart1.IdleCallback = 0;
@@ -398,8 +418,8 @@ static void UartVarInit(void)
     g_tUart2.usRxRead = 0;                               /* 接收FIFO读索引 */
     g_tUart2.usRxCount = 0;                              /* 接收到的新数据个数 */
     g_tUart2.usTxCount = 0;                              /* 待发送的数据个数 */
-    g_tUart2.SendBefor = 0;                              /* 发送数据前的回调函数 */
-    g_tUart2.SendOver = 0;                               /* 发送完毕后的回调函数 */
+    g_tUart2.SendBefor = RS485_SendBefor;                /* 发送数据前的回调函数 */
+    g_tUart2.SendOver = RS485_SendOver;                  /* 发送完毕后的回调函数 */
     g_tUart2.ReciveNew = 0;                              /* 接收到新数据后的回调函数 */
     g_tUart2.Sending = 0;                                /* 正在发送中标志 */
     g_tUart2.IdleCallback = 0;
@@ -418,8 +438,8 @@ static void UartVarInit(void)
     g_tUart3.usRxRead = 0;                               /* 接收FIFO读索引 */
     g_tUart3.usRxCount = 0;                              /* 接收到的新数据个数 */
     g_tUart3.usTxCount = 0;                              /* 待发送的数据个数 */
-    g_tUart3.SendBefor = 0;                              /* 发送数据前的回调函数 */
-    g_tUart3.SendOver = 0;                               /* 发送完毕后的回调函数 */
+    g_tUart3.SendBefor = RS485_SendBefor;                /* 发送数据前的回调函数 */
+    g_tUart3.SendOver = RS485_SendOver;                  /* 发送完毕后的回调函数 */
     g_tUart3.ReciveNew = 0;                              /* 接收到新数据后的回调函数 */
     g_tUart3.Sending = 0;                                /* 正在发送中标志 */
 #endif
@@ -452,55 +472,6 @@ void comSetUartParam(USART_TypeDef *Instance, uint32_t BaudRate, uint16_t WordLe
     if (HAL_UART_Init(&UartHandle) != HAL_OK) {
         bsp_Error_Handler(__FILE__, __LINE__);
     }
-}
-
-/**
- * @brief 检查引脚字符串是否合法。例如：A.01
- * @param {char} *name
- * @return {*}
- */
-static bool _check_pin_name_valid(const char *name)
-{
-    if (!(strlen(name) == 4 && name[1] == '.')) {
-        return false;
-    }
-
-    if ((name[0] < 'A' || name[0] > 'D') || (name[2] < '0' || name[2] > '1') || (name[3] < '0' || name[3] > '9')) {
-        return false;
-    }
-
-    uint8_t pinnumber = (name[2] - '0') * 10 + (name[3] - '0');
-    if (pinnumber > 15) {
-        return false;
-    }
-    return true;
-}
-
-/**
- * @brief 将字符串转换成GPIO,并且使能时钟
- * @param {char} *name
- * @param {UART_T} _uart
- * @return {*}
- */
-static bool _translate_pin_name(const char *name, GPIO_TypeDef **tx_port, uint32_t *tx_pin)
-{
-    if (!(_check_pin_name_valid(name))) {
-        return false;
-    }
-
-    *tx_port = gpio_table[name[0] - 'A'];
-    *tx_pin = (1 << ((uint8_t)((name[2] - '0') * 10 + (name[3] - '0'))));
-
-    if (name[0] == 'A') {
-        __HAL_RCC_GPIOA_CLK_ENABLE();
-    } else if (name[0] == 'B') {
-        __HAL_RCC_GPIOB_CLK_ENABLE();
-    } else if (name[0] == 'C') {
-        __HAL_RCC_GPIOC_CLK_ENABLE();
-    } else if (name[0] == 'D') {
-        __HAL_RCC_GPIOD_CLK_ENABLE();
-    }
-    return true;
 }
 
 /*

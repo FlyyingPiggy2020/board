@@ -89,7 +89,9 @@ void bsp_RunPer100ms(void) {}
 */
 void bsp_RunPer10ms(void)
 {
+    #if (CONFIG_BSP_HARD_KEY_NUM >= 1)
     bsp_KeyScan10ms();
+    #endif
 }
 
 /*

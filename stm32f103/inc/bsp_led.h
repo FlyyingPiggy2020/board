@@ -17,7 +17,12 @@
 #include "stdint.h"
 
 typedef enum {
-    LED_ID1 = 0,
+#if (CONFIG_BSP_LED_NUM >= 1)
+    LED_ID1,
+#endif
+#if (CONFIG_BSP_LED_NUM >= 2)
+    LED_ID2,
+#endif
     LED_IDX,
 } LED_ID_E;
 
@@ -29,6 +34,3 @@ void bsp_LedToggle(uint8_t _no);
 uint8_t bsp_IsLedOn(uint8_t _no);
 
 #endif
-
-/***************************** 安富莱电子 www.armfly.com (END OF FILE)
- * *********************************/

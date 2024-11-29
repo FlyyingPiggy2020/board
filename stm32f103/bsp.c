@@ -36,9 +36,13 @@ void bsp_Init(void)
 {
     bsp_InitTimer();
     bsp_InitUart(); /* 串口初始化 */
+    #if (CONFIG_BSP_LED_NUM >= 1)
     bsp_InitLed();  /* 初始化LED */
+    #endif
     bsp_InitI2C();  /* 初始化I2C */
+    #if (CONFIG_BSP_HARD_KEY_NUM >= 1)
     bsp_InitKey();
+    #endif
 }
 
 /*

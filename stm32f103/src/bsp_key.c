@@ -8,8 +8,10 @@
  * @Brief        : 按键驱动魔改自安富莱
  */
 
+
 /*---------- includes ----------*/
 #include "bsp.h"
+#if (CONFIG_BSP_HARD_KEY_NUM >= 1)
 /*---------- macro ----------*/
 /*---------- type define ----------*/
 /*---------- variable prototype ----------*/
@@ -419,6 +421,4 @@ void bsp_KeyScan1ms(void)
         bsp_DetectFastIO(i);
     }
 }
-
-/***************************** 安富莱电子 www.armfly.com (END OF FILE)
- * *********************************/
+#endif

@@ -174,4 +174,28 @@ menu "STM32F103 BOARD"
                     Select the active level for key.0 means low active, 1 means high active.
         endif
     endmenu
+
+    menu "LED Configuration"
+        config BSP_LED_NUM
+            int "Number of LEDs"
+            default 1
+            range 0 2
+            help 
+                This option sets the number of LEDs in the system.
+        if BSP_LED_NUM >= 1
+            config BSP_LED1_IO
+                string "GPIO for LED 1"
+                default "B.08"
+                help
+                    Select the GPIO for LED 1
+        endif
+
+        if BSP_LED_NUM >= 2
+            config BSP_LED2_IO
+                string "GPIO for LED 2"
+                default "B.09"
+                help
+                    Select the GPIO for LED 2
+        endif
+    endmenu
 endmenu

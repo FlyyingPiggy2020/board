@@ -1,0 +1,237 @@
+menu "STM32F103 BOARD"
+    menu "UART Configuration"
+    # UART1 Configuration
+    config BSP_UART1_EN
+        bool "Enable UART1"
+        default y
+        help 
+            Enable UART1 for communication
+        
+        if BSP_UART1_EN
+        config BSP_UART1_BAUD
+            int "UART1 Baudrate"
+            default 115200
+            help 
+                Select the baudrate for UART1
+
+        config BSP_UART1_TX_BUF_SIZE
+            int "UART1 TX Buffer Size"
+            default 512
+            help
+                Select the TX buffer size for UART1
+
+        config BSP_UART1_RX_BUF_SIZE
+            int "UART1 RX Buffer Size"
+            default 512
+            help 
+                Select the RX buffer size for UART1
+
+        config BSP_USART1_TX_IO
+            string "UART1 TX GPIO"
+            default "A.09"
+            help
+                Select the TX GPIO for UART1
+
+        config BSP_USART1_RX_IO
+            string "UART1 RX GPIO"
+            default "A.10"
+            help
+                Select the RX GPIO for UART1
+
+        config BSP_USART1_485_EN
+            bool "UART1 485 Enable"
+            default n
+            help
+                Enable UART1 485 mod
+            if BSP_USART1_485_EN
+            config BSP_USART1_485_TXE_IO
+                string "UART1 485 TXE GPIO"
+                default "B.02"
+                help
+                    Select the TX GPIO for UART1 485
+            
+            config BSP_USART1_485_TX_EN_LEVEL
+                int "UART1 485 TX Enable Level"
+                default 1
+                range 0 1
+                help
+                    Select the TX enable level for UART1 485
+            endif
+        endif
+
+    # UART2 Configuration
+    config BSP_UART2_EN
+        bool "Enable UART2"
+        default n
+        help 
+            Enable UART2 for communication
+        
+        if BSP_UART2_EN
+        config BSP_UART2_BAUD
+            int "UART2 Baudrate"
+            default 115200
+            help 
+                Select the baudrate for UART2
+
+        config BSP_UART2_TX_BUF_SIZE
+            int "UART2 TX Buffer Size"
+            default 512
+            help
+                Select the TX buffer size for UART2
+
+        config BSP_UART2_RX_BUF_SIZE
+            int "UART2 RX Buffer Size"
+            default 512
+            help 
+                Select the RX buffer size for UART2
+
+        config BSP_USART2_TX_IO
+            string "UART2 TX GPIO"
+            default "A.02"
+            help
+                Select the TX GPIO for UART2
+
+        config BSP_USART2_RX_IO
+            string "UART2 RX GPIO"
+            default "A.03"
+            help
+                Select the RX GPIO for UART2
+        endif
+
+    # UART3 Configuration
+    config BSP_UART3_EN
+        bool "Enable UART3"
+        default n
+        help 
+            Enable UART3 for communication
+        
+        if BSP_UART3_EN
+        config BSP_UART3_BAUD
+            int "UART3 Baudrate"
+            default 115200
+            help 
+                Select the baudrate for UART2
+
+        config BSP_UART3_TX_BUF_SIZE
+            int "UART3 TX Buffer Size"
+            default 512
+            help
+                Select the TX buffer size for UART3
+
+        config BSP_UART3_RX_BUF_SIZE
+            int "UART3 RX Buffer Size"
+            default 512
+            help 
+                Select the RX buffer size for UART3
+
+        config BSP_USART3_TX_IO
+            string "UART3 TX GPIO"
+            default "B.10"
+            help
+                Select the TX GPIO for UART3
+
+        config BSP_USART3_RX_IO
+            string "UART3 RX GPIO"
+            default "B.11"
+            help
+                Select the RX GPIO for UART3
+        endif
+    endmenu
+
+    menu "ADC Configuration"
+        config BSP_ADC_CH_MAX
+            int "Number of ADCs Channel"
+            default 2
+            range 0 2
+            help 
+                This option sets the number of the ADCs in the system.Default use ADC1 and DMA1.
+
+        config BSP_ADC_FILTER_COUNT
+            int "ADC Filter Count"
+            default 5
+            range 3 10
+            help 
+                This option sets the ADC filter count.Min count is 3.
+        
+                
+        if BSP_ADC_CH_MAX >= 1
+            config BSP_USE_POWER_CHECK
+                bool "Use Power Check"
+                default n
+                help
+                    Enable power check
+
+            config BSP_ADC1_CH1_IO
+                string "ADC1 Channel GPIO1.The GPIO will be used as a PD IO if Power Check is enabled."
+                default "A.00"
+                help
+                    Select the GPIO for ADC1 Channel.
+        endif
+            
+        if BSP_ADC_CH_MAX >= 2
+            config BSP_ADC1_CH2_IO
+                string "ADC1 Channel GPIO"
+                default "A.01"
+                help
+                    Select the GPIO for ADC1 Channel
+        endif
+    endmenu
+    
+    menu "KEY Configuration"
+        config BSP_HARD_KEY_NUM
+            int "Number of Hard Keys"
+            default 1
+            range 0 1
+            help 
+                This option sets the number of phyiscal keys in the system.
+        config BSP_KEYFILTER_TIME
+            int "Key Filter Time. unit:10ms"
+            default 5
+            range 0 10
+            help 
+                This option sets the key filter time.
+        config BSP_KEY_LONG_TIME
+            int "Key Long Time. unit:10ms"
+            default 500
+            range 0 1000
+            help
+                This option sets the key long time.
+    
+        if BSP_HARD_KEY_NUM >= 1
+            config BSP_KEY1_IO
+                string "GPIO for Key 1"
+                default "A.01"
+                help 
+                    Select the GPIO for key 1
+            config BSP_KEY1_ACTIVE_LEVEL
+                int "Active Level for Key 1"
+                default 1
+                help 
+                    Select the active level for key.0 means low active, 1 means high active.
+        endif
+    endmenu
+
+    menu "LED Configuration"
+        config BSP_LED_NUM
+            int "Number of LEDs"
+            default 1
+            range 0 2
+            help 
+                This option sets the number of LEDs in the system.
+        if BSP_LED_NUM >= 1
+            config BSP_LED1_IO
+                string "GPIO for LED 1"
+                default "B.08"
+                help
+                    Select the GPIO for LED 1
+        endif
+
+        if BSP_LED_NUM >= 2
+            config BSP_LED2_IO
+                string "GPIO for LED 2"
+                default "B.09"
+                help
+                    Select the GPIO for LED 2
+        endif
+    endmenu
+endmenu

@@ -14,6 +14,7 @@
 *********************************************************************************************************
 */
 #include "bsp.h"
+#include "stdbool.h"
 #include "main.h"
 
 /*
@@ -33,10 +34,18 @@
 */
 void bsp_Init(void)
 {
+    bsp_InitTimer();
     bsp_InitUart(); /* 串口初始化 */
-    bsp_InitLed();  /* 初始化LED */
-    bsp_InitI2C();  /* 初始化I2C */
+#if (CONFIG_BSP_LED_NUM >= 1)
+    bsp_InitLed();
+#endif
+    bsp_InitI2C();
+#if (CONFIG_BSP_HARD_KEY_NUM >= 1)
     bsp_InitKey();
+#endif
+#if (CONFIG_BSP_ADC_CH_MAX >= 1)
+    bsp_adc_init();
+#endif
 }
 
 /*
@@ -83,23 +92,58 @@ void bsp_Idle(void)
 #endif
 }
 
-/*
-*********************************************************************************************************
-*   函 数 名: HAL_Delay
-*   功能说明:
-*重定向毫秒延迟函数。替换HAL中的函数。因为HAL中的缺省函数依赖于Systick中断，如果在USB、SD卡
-*             中断中有延迟函数，则会锁死。也可以通过函数HAL_NVIC_SetPriority提升Systick中断
-*   形    参: 无
-*   返 回 值: 无
-*********************************************************************************************************
-*/
-/* 当前例子使用stm32f4xx_hal.c默认方式实现，未使用下面重定向的函数 */
-#if 0
-void HAL_Delay(uint32_t Delay)
+/**
+ * @brief 检查引脚字符串是否合法。例如：A.01
+ * @param {char} *name
+ * @return {*}
+ */
+static bool _check_pin_name_valid(const char *name)
 {
-    bsp_DelayUS(Delay * 1000);
-}
-#endif
+    if (!(strlen(name) == 4 && name[1] == '.')) {
+        return false;
+    }
 
-/***************************** 安富莱电子 www.armfly.com (END OF FILE)
- * *********************************/
+    if ((name[0] < 'A' || name[0] > 'D') || (name[2] < '0' || name[2] > '1') || (name[3] < '0' || name[3] > '9')) {
+        return false;
+    }
+
+    uint8_t pinnumber = (name[2] - '0') * 10 + (name[3] - '0');
+    if (pinnumber > 15) {
+        return false;
+    }
+    return true;
+}
+
+static GPIO_TypeDef *gpio_table[] = {
+    GPIOA,
+    GPIOB,
+    GPIOC,
+    GPIOD,
+};
+
+/**
+ * @brief 将字符串转换成GPIO,并且使能时钟
+ * @param {char} *name
+ * @param {UART_T} _uart
+ * @return {*}
+ */
+bool _translate_pin_name(const char *name, GPIO_TypeDef **tx_port, uint32_t *tx_pin)
+{
+    if (!(_check_pin_name_valid(name))) {
+        return false;
+    }
+
+    *tx_port = gpio_table[name[0] - 'A'];
+    *tx_pin = (1 << ((uint8_t)((name[2] - '0') * 10 + (name[3] - '0'))));
+
+    if (name[0] == 'A') {
+        __HAL_RCC_GPIOA_CLK_ENABLE();
+    } else if (name[0] == 'B') {
+        __HAL_RCC_GPIOB_CLK_ENABLE();
+    } else if (name[0] == 'C') {
+        __HAL_RCC_GPIOC_CLK_ENABLE();
+    } else if (name[0] == 'D') {
+        __HAL_RCC_GPIOD_CLK_ENABLE();
+    }
+    return true;
+}

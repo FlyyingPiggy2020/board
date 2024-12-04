@@ -16,7 +16,9 @@
 
 #ifndef _BSP_H_
 #define _BSP_H_
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* 定义 BSP 版本号 */
 #define __STM32F1_BSP_VERSION "1.1"
 
@@ -37,7 +39,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdbool.h>
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -49,8 +51,9 @@
 /* 定义优先级分组 */
 #define NVIC_PREEMPT_PRIORITY 4
 
-#include "bsp_config.example.h"
+#include "bsp_config.h"
 /* 通过取消注释或者添加注释的方式控制是否包含底层驱动模块 */
+#include "bsp_adc.h"
 #include "bsp_i2c_eeprom_24xx.h"
 #include "bsp_i2c_gpio.h"
 #include "bsp_key.h"
@@ -64,8 +67,9 @@ void bsp_Idle(void);
 
 void bsp_GetCpuID(uint32_t *_id);
 void bsp_Error_Handler(char *file, uint32_t line);
+bool _translate_pin_name(const char *name, GPIO_TypeDef **tx_port, uint32_t *tx_pin);
 
+#ifdef __cplusplus
+}
 #endif
-
-/***************************** 安富莱电子 www.armfly.com (END OF FILE)
- * *********************************/
+#endif

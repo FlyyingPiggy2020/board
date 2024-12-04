@@ -9,7 +9,10 @@
  */
 
 #ifndef __BSP_CONFIG_H__
+#define __BSP_CONFIG_H__
 /*---------- includes ----------*/
+#include "autoconfig.h"
+
 /*---------- macro ----------*/
 /*---------- type define ----------*/
 /*---------- variable prototype ----------*/

@@ -1,56 +1,36 @@
 /*
-*********************************************************************************************************
-*
-*   模块名称 : 独立按键驱动模块 (外部输入IO)
-*   文件名称 : bsp_key.c
-*   版    本 : V1.3
-*   说    明 : 扫描独立按键，具有软件滤波机制，具有按键FIFO。可以检测如下事件：
-*               (1) 按键按下
-*               (2) 按键弹起
-*               (3) 长按键
-*               (4) 长按时自动连发
-*
-*   修改记录 :
-*       版本号  日期        作者     说明
-*       V1.0    2013-02-01 armfly  正式发布
-*       V1.1    2013-06-29 armfly  增加1个读指针，用于bsp_Idle()
-*函数读取系统控制组合键（截屏） 增加 K1 K2 组合键 和 K2 K3 组合键，用于系统控制
-*       V1.2    2016-01-25 armfly  针对P02工控板更改. 调整gpio定义方式，更加简洁
-*       V1.3    2018-11-26 armfly  s_tBtn结构赋初值0
-*
-*   Copyright (C), 2016-2020, 安富莱电子 www.armfly.com
-*
-*********************************************************************************************************
-*/
+ * Copyright (c) 2024 by Lu Xianfan.
+ * @FilePath     : bsp_key.c
+ * @Author       : lxf
+ * @Date         : 2024-11-26 13:18:49
+ * @LastEditors  : FlyyingPiggy2020 154562451@qq.com
+ * @LastEditTime : 2024-11-29 08:34:52
+ * @Brief        : 按键驱动魔改自安富莱
+ */
 
+/*---------- includes ----------*/
 #include "bsp.h"
+#if (CONFIG_BSP_HARD_KEY_NUM >= 1)
+/*---------- macro ----------*/
+/*---------- type define ----------*/
+/*---------- variable prototype ----------*/
+/*---------- function prototype ----------*/
+/*---------- variable ----------*/
+/*---------- function ----------*/
+/*---------- end of file ----------*/
 
-/*
-    安富莱STM32-V5 按键口线分配：
-        Key 键      : PB12   (低电平表示按下)
-*/
-
-#define HARD_KEY_NUM KID_NUM        /* 实体按键个数 */
-#define KEY_COUNT    (HARD_KEY_NUM) /* 1个独立建 */
-
-/* 使能GPIO时钟 */
-#define ALL_KEY_GPIO_CLK_ENABLE()     \
-    {                                 \
-        __HAL_RCC_GPIOA_CLK_ENABLE(); \
-        __HAL_RCC_GPIOB_CLK_ENABLE(); \
-    };
+#define HARD_KEY_NUM CONFIG_BSP_HARD_KEY_NUM /* 实体按键个数 */
+#define KEY_COUNT    (HARD_KEY_NUM)          /* 1个独立建 */
 
 /* 依次定义GPIO */
 typedef struct {
     GPIO_TypeDef *gpio;
-    uint16_t pin;
+    uint32_t pin;
     uint8_t ActiveLevel; /* 激活电平 */
 } X_GPIO_T;
 
 /* GPIO和PIN定义 */
-static const X_GPIO_T s_gpio_list[HARD_KEY_NUM] = {
-    { GPIOB, GPIO_PIN_13, 0 }, /* Key */
-};
+static X_GPIO_T s_gpio_list[HARD_KEY_NUM] = { 0 };
 
 /* 定义一个宏函数简化后续代码
     判断GPIO引脚是否有效按下
@@ -153,10 +133,6 @@ static void bsp_InitKeyHard(void)
     GPIO_InitTypeDef gpio_init;
     uint8_t i;
 
-    /* 第1步：打开GPIO时钟 */
-    ALL_KEY_GPIO_CLK_ENABLE();
-
-    /* 第2步：配置所有的按键GPIO为浮动输入模式(实际上CPU复位后就是输入状态) */
     gpio_init.Mode = GPIO_MODE_INPUT;       /* 设置输入 */
     gpio_init.Pull = GPIO_NOPULL;           /* 上下拉电阻不使能 */
     gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
@@ -193,6 +169,10 @@ static void bsp_InitKeyVar(void)
         s_tBtn[i].RepeatCount = 0;             /* 连发计数器 */
     }
 
+#if (CONFIG_BSP_HARD_KEY_NUM >= 1)
+    _translate_pin_name(CONFIG_BSP_KEY1_IO, &s_gpio_list[0].gpio, &s_gpio_list[0].pin);
+    s_gpio_list[0].ActiveLevel = CONFIG_BSP_KEY1_ACTIVE_LEVEL;
+#endif
     /* 如果需要单独更改某个按键的参数，可以在此单独重新赋值 */
 }
 
@@ -259,19 +239,6 @@ uint8_t bsp_GetKey2(void)
         }
         return ret;
     }
-}
-
-/*
-*********************************************************************************************************
-*   函 数 名: bsp_GetKeyState
-*   功能说明: 读取按键的状态
-*   形    参:  _ucKeyID : 按键ID，从0开始
-*   返 回 值: 1 表示按下， 0 表示未按下
-*********************************************************************************************************
-*/
-uint8_t bsp_GetKeyState(KEY_ID_E _ucKeyID)
-{
-    return s_tBtn[_ucKeyID].State;
 }
 
 /*
@@ -452,6 +419,4 @@ void bsp_KeyScan1ms(void)
         bsp_DetectFastIO(i);
     }
 }
-
-/***************************** 安富莱电子 www.armfly.com (END OF FILE)
- * *********************************/
+#endif

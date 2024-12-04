@@ -207,7 +207,7 @@ int32_t comSendBuf(COM_PORT_E _ucPort, uint8_t *_ucaBuf, uint16_t _usLen)
         pUart->SendBefor(pUart->com);
     }
     ret = hosal_uart_send(pUart->uart, _ucaBuf, _usLen);
-    hosal_uart_ioctl(pUart->uart, HOSAL_UART_FLUSH, NULL); //阻塞发送
+    hosal_uart_ioctl(pUart->uart, HOSAL_UART_FLUSH, NULL); // 阻塞发送
     if (pUart->SendOver != NULL) {
         pUart->SendOver(pUart->com);
     }

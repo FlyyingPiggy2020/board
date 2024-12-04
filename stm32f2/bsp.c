@@ -22,5 +22,8 @@
  * @brief 需要放在CubeMX自动生成的函数后面
  * @return {*}
  */
-void bsp_init(void) { bsp_uart_init(); }
+void bsp_init(void)
+{
+    bsp_uart_init();
+}
 /*---------- end of file ----------*/

@@ -31,7 +31,7 @@ static volatile uint32_t s_uiDelayCount = 0;
 static volatile uint8_t s_ucTimeOutFlag = 0;
 
 /* 定于软件定时器结构体变量 */
-static SOFT_TMR s_tTmr[TMR_COUNT] = {0};
+static SOFT_TMR s_tTmr[TMR_COUNT] = { 0 };
 
 /*
     全局运行时间，单位1ms
@@ -51,18 +51,19 @@ static void bsp_SoftTimerDec(SOFT_TMR *_tmr);
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void bsp_InitTimer(void) {
-  uint8_t i;
+void bsp_InitTimer(void)
+{
+    uint8_t i;
 
-  /* 清零所有的软件定时器 */
-  for (i = 0; i < TMR_COUNT; i++) {
-    s_tTmr[i].Count = 0;
-    s_tTmr[i].PreLoad = 0;
-    s_tTmr[i].Flag = 0;
-    s_tTmr[i].Mode = TMR_ONCE_MODE; /* 缺省是1次性工作模式 */
-  }
+    /* 清零所有的软件定时器 */
+    for (i = 0; i < TMR_COUNT; i++) {
+        s_tTmr[i].Count = 0;
+        s_tTmr[i].PreLoad = 0;
+        s_tTmr[i].Flag = 0;
+        s_tTmr[i].Mode = TMR_ONCE_MODE; /* 缺省是1次性工作模式 */
+    }
 
-  g_ucEnableSystickISR = 1; /* 1表示执行systick中断 */
+    g_ucEnableSystickISR = 1; /* 1表示执行systick中断 */
 }
 /*
 *********************************************************************************************************
@@ -86,7 +87,10 @@ void bsp_RunPer100ms(void) {}
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void bsp_RunPer10ms(void) { bsp_KeyScan10ms(); }
+void bsp_RunPer10ms(void)
+{
+    bsp_KeyScan10ms();
+}
 
 /*
 *********************************************************************************************************
@@ -108,43 +112,43 @@ void bsp_RunPer1ms(void) {}
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void SysTick_ISR(void) {
-  static uint8_t s_count = 0, s_cnt = 0;
-  uint8_t i;
+void SysTick_ISR(void)
+{
+    static uint8_t s_count = 0, s_cnt = 0;
+    uint8_t i;
 
-  /* 每隔1ms进来1次 （仅用于 bsp_DelayMS） */
-  if (s_uiDelayCount > 0) {
-    if (--s_uiDelayCount == 0) {
-      s_ucTimeOutFlag = 1;
+    /* 每隔1ms进来1次 （仅用于 bsp_DelayMS） */
+    if (s_uiDelayCount > 0) {
+        if (--s_uiDelayCount == 0) {
+            s_ucTimeOutFlag = 1;
+        }
     }
-  }
 
-  /* 每隔1ms，对软件定时器的计数器进行减一操作 */
-  for (i = 0; i < TMR_COUNT; i++) {
-    bsp_SoftTimerDec(&s_tTmr[i]);
-  }
+    /* 每隔1ms，对软件定时器的计数器进行减一操作 */
+    for (i = 0; i < TMR_COUNT; i++) {
+        bsp_SoftTimerDec(&s_tTmr[i]);
+    }
 
-  /* 全局运行时间每1ms增1 */
-  g_iRunTime++;
-  if (g_iRunTime ==
-      0x7FFFFFFF) /* 这个变量是 int32_t 类型，最大数为 0x7FFFFFFF */
-  {
-    g_iRunTime = 0;
-  }
+    /* 全局运行时间每1ms增1 */
+    g_iRunTime++;
+    if (g_iRunTime == 0x7FFFFFFF) /* 这个变量是 int32_t 类型，最大数为 0x7FFFFFFF */
+    {
+        g_iRunTime = 0;
+    }
 
-  bsp_RunPer1ms(); /* 每隔1ms调用一次此函数，此函数在 bsp.c */
+    bsp_RunPer1ms(); /* 每隔1ms调用一次此函数，此函数在 bsp.c */
 
-  if (++s_count >= 10) {
-    s_count = 0;
+    if (++s_count >= 10) {
+        s_count = 0;
 
-    bsp_RunPer10ms(); /* 每隔10ms调用一次此函数，此函数在 bsp.c */
-  }
+        bsp_RunPer10ms(); /* 每隔10ms调用一次此函数，此函数在 bsp.c */
+    }
 
-  if (++s_cnt >= 100) {
-    s_cnt = 0;
+    if (++s_cnt >= 100) {
+        s_cnt = 0;
 
-    bsp_RunPer100ms(); /* 每隔100ms调用一次此函数，此函数在 bsp.c */
-  }
+        bsp_RunPer100ms(); /* 每隔100ms调用一次此函数，此函数在 bsp.c */
+    }
 }
 /*
 *********************************************************************************************************
@@ -154,18 +158,19 @@ void SysTick_ISR(void) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-static void bsp_SoftTimerDec(SOFT_TMR *_tmr) {
-  if (_tmr->Count > 0) {
-    /* 如果定时器变量减到1则设置定时器到达标志 */
-    if (--_tmr->Count == 0) {
-      _tmr->Flag = 1;
+static void bsp_SoftTimerDec(SOFT_TMR *_tmr)
+{
+    if (_tmr->Count > 0) {
+        /* 如果定时器变量减到1则设置定时器到达标志 */
+        if (--_tmr->Count == 0) {
+            _tmr->Flag = 1;
 
-      /* 如果是自动模式，则自动重装计数器 */
-      if (_tmr->Mode == TMR_AUTO_MODE) {
-        _tmr->Count = _tmr->PreLoad;
-      }
+            /* 如果是自动模式，则自动重装计数器 */
+            if (_tmr->Mode == TMR_AUTO_MODE) {
+                _tmr->Count = _tmr->PreLoad;
+            }
+        }
     }
-  }
 }
 
 /*
@@ -176,32 +181,33 @@ static void bsp_SoftTimerDec(SOFT_TMR *_tmr) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void bsp_DelayMS(uint32_t n) {
-  if (n == 0) {
-    return;
-  } else if (n == 1) {
-    n = 2;
-  }
-
-  DISABLE_INT(); /* 关中断 */
-
-  s_uiDelayCount = n;
-  s_ucTimeOutFlag = 0;
-
-  ENABLE_INT(); /* 开中断 */
-
-  while (1) {
-    bsp_Idle(); /* CPU空闲执行的操作， 见 bsp.c 和 bsp.h 文件 */
-
-    /*
-        等待延迟时间到
-        注意：编译器认为 s_ucTimeOutFlag = 0，所以可能优化错误，因此
-       s_ucTimeOutFlag 变量必须申明为 volatile
-    */
-    if (s_ucTimeOutFlag == 1) {
-      break;
+void bsp_DelayMS(uint32_t n)
+{
+    if (n == 0) {
+        return;
+    } else if (n == 1) {
+        n = 2;
     }
-  }
+
+    DISABLE_INT(); /* 关中断 */
+
+    s_uiDelayCount = n;
+    s_ucTimeOutFlag = 0;
+
+    ENABLE_INT(); /* 开中断 */
+
+    while (1) {
+        bsp_Idle(); /* CPU空闲执行的操作， 见 bsp.c 和 bsp.h 文件 */
+
+        /*
+            等待延迟时间到
+            注意：编译器认为 s_ucTimeOutFlag = 0，所以可能优化错误，因此
+           s_ucTimeOutFlag 变量必须申明为 volatile
+        */
+        if (s_ucTimeOutFlag == 1) {
+            break;
+        }
+    }
 }
 #if (MCU_CORE_TYPE == MCU_CORE_STM32) // MCU类型
 /*
@@ -212,38 +218,39 @@ void bsp_DelayMS(uint32_t n) {
 *    返 回 值: 无
 *********************************************************************************************************
 */
-void bsp_DelayUS(uint32_t n) {
-  uint32_t ticks;
-  uint32_t told;
-  uint32_t tnow;
-  uint32_t tcnt = 0;
-  uint32_t reload;
+void bsp_DelayUS(uint32_t n)
+{
+    uint32_t ticks;
+    uint32_t told;
+    uint32_t tnow;
+    uint32_t tcnt = 0;
+    uint32_t reload;
 
-  reload = SysTick->LOAD;
-  ticks = n * (SystemCoreClock / 1000000); /* 需要的节拍数 */
+    reload = SysTick->LOAD;
+    ticks = n * (SystemCoreClock / 1000000); /* 需要的节拍数 */
 
-  tcnt = 0;
-  told = SysTick->VAL; /* 刚进入时的计数器值 */
+    tcnt = 0;
+    told = SysTick->VAL; /* 刚进入时的计数器值 */
 
-  while (1) {
-    tnow = SysTick->VAL;
-    if (tnow != told) {
-      /* SYSTICK是一个递减的计数器 */
-      if (tnow < told) {
-        tcnt += told - tnow;
-      }
-      /* 重新装载递减 */
-      else {
-        tcnt += reload - tnow + told;
-      }
-      told = tnow;
+    while (1) {
+        tnow = SysTick->VAL;
+        if (tnow != told) {
+            /* SYSTICK是一个递减的计数器 */
+            if (tnow < told) {
+                tcnt += told - tnow;
+            }
+            /* 重新装载递减 */
+            else {
+                tcnt += reload - tnow + told;
+            }
+            told = tnow;
 
-      /* 时间超过/等于要延迟的时间,则退出 */
-      if (tcnt >= ticks) {
-        break;
-      }
+            /* 时间超过/等于要延迟的时间,则退出 */
+            if (tcnt >= ticks) {
+                break;
+            }
+        }
     }
-  }
 }
 #endif
 /*
@@ -256,21 +263,22 @@ void bsp_DelayUS(uint32_t n) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void bsp_StartTimer(uint8_t _id, uint32_t _period) {
-  if (_id >= TMR_COUNT) {
-    /* 打印出错的源代码文件名、函数名称 */
-    while (1)
-      ; /* 参数异常，死机等待看门狗复位 */
-  }
+void bsp_StartTimer(uint8_t _id, uint32_t _period)
+{
+    if (_id >= TMR_COUNT) {
+        /* 打印出错的源代码文件名、函数名称 */
+        while (1)
+            ; /* 参数异常，死机等待看门狗复位 */
+    }
 
-  DISABLE_INT(); /* 关中断 */
+    DISABLE_INT(); /* 关中断 */
 
-  s_tTmr[_id].Count = _period; /* 实时计数器初值 */
-  s_tTmr[_id].PreLoad = _period; /* 计数器自动重装值，仅自动模式起作用 */
-  s_tTmr[_id].Flag = 0;             /* 定时时间到标志 */
-  s_tTmr[_id].Mode = TMR_ONCE_MODE; /* 1次性工作模式 */
+    s_tTmr[_id].Count = _period;      /* 实时计数器初值 */
+    s_tTmr[_id].PreLoad = _period;    /* 计数器自动重装值，仅自动模式起作用 */
+    s_tTmr[_id].Flag = 0;             /* 定时时间到标志 */
+    s_tTmr[_id].Mode = TMR_ONCE_MODE; /* 1次性工作模式 */
 
-  DISABLE_INT(); /* 开中断 */
+    DISABLE_INT(); /* 开中断 */
 }
 
 /*
@@ -283,21 +291,22 @@ void bsp_StartTimer(uint8_t _id, uint32_t _period) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void bsp_StartAutoTimer(uint8_t _id, uint32_t _period) {
-  if (_id >= TMR_COUNT) {
-    /* 打印出错的源代码文件名、函数名称 */
-    while (1)
-      ; /* 参数异常，死机等待看门狗复位 */
-  }
+void bsp_StartAutoTimer(uint8_t _id, uint32_t _period)
+{
+    if (_id >= TMR_COUNT) {
+        /* 打印出错的源代码文件名、函数名称 */
+        while (1)
+            ; /* 参数异常，死机等待看门狗复位 */
+    }
 
-  DISABLE_INT(); /* 关中断 */
+    DISABLE_INT(); /* 关中断 */
 
-  s_tTmr[_id].Count = _period; /* 实时计数器初值 */
-  s_tTmr[_id].PreLoad = _period; /* 计数器自动重装值，仅自动模式起作用 */
-  s_tTmr[_id].Flag = 0;             /* 定时时间到标志 */
-  s_tTmr[_id].Mode = TMR_AUTO_MODE; /* 自动工作模式 */
+    s_tTmr[_id].Count = _period;      /* 实时计数器初值 */
+    s_tTmr[_id].PreLoad = _period;    /* 计数器自动重装值，仅自动模式起作用 */
+    s_tTmr[_id].Flag = 0;             /* 定时时间到标志 */
+    s_tTmr[_id].Mode = TMR_AUTO_MODE; /* 自动工作模式 */
 
-  DISABLE_INT(); /* 开中断 */
+    DISABLE_INT(); /* 开中断 */
 }
 
 /*
@@ -309,20 +318,21 @@ void bsp_StartAutoTimer(uint8_t _id, uint32_t _period) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void bsp_StopTimer(uint8_t _id) {
-  if (_id >= TMR_COUNT) {
-    /* 打印出错的源代码文件名、函数名称 */
-    while (1)
-      ; /* 参数异常，死机等待看门狗复位 */
-  }
+void bsp_StopTimer(uint8_t _id)
+{
+    if (_id >= TMR_COUNT) {
+        /* 打印出错的源代码文件名、函数名称 */
+        while (1)
+            ; /* 参数异常，死机等待看门狗复位 */
+    }
 
-  DISABLE_INT(); /* 关中断 */
+    DISABLE_INT(); /* 关中断 */
 
-  s_tTmr[_id].Count = 0;            /* 实时计数器初值 */
-  s_tTmr[_id].Flag = 0;             /* 定时时间到标志 */
-  s_tTmr[_id].Mode = TMR_ONCE_MODE; /* 自动工作模式 */
+    s_tTmr[_id].Count = 0;            /* 实时计数器初值 */
+    s_tTmr[_id].Flag = 0;             /* 定时时间到标志 */
+    s_tTmr[_id].Mode = TMR_ONCE_MODE; /* 自动工作模式 */
 
-  DISABLE_INT(); /* 开中断 */
+    DISABLE_INT(); /* 开中断 */
 }
 
 /*
@@ -335,17 +345,18 @@ void bsp_StopTimer(uint8_t _id) {
 *   返 回 值: 返回 0 表示定时未到， 1表示定时到
 *********************************************************************************************************
 */
-uint8_t bsp_CheckTimer(uint8_t _id) {
-  if (_id >= TMR_COUNT) {
-    return 0;
-  }
+uint8_t bsp_CheckTimer(uint8_t _id)
+{
+    if (_id >= TMR_COUNT) {
+        return 0;
+    }
 
-  if (s_tTmr[_id].Flag == 1) {
-    s_tTmr[_id].Flag = 0;
-    return 1;
-  } else {
-    return 0;
-  }
+    if (s_tTmr[_id].Flag == 1) {
+        s_tTmr[_id].Flag = 0;
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 /*
@@ -358,17 +369,18 @@ uint8_t bsp_CheckTimer(uint8_t _id) {
 *   返 回 值: 返回 0 表示定时未到， 1表示定时到
 *********************************************************************************************************
 */
-uint8_t bsp_CountTimer(uint8_t _id) {
-  if (_id >= TMR_COUNT) {
-    return 0;
-  }
+uint8_t bsp_CountTimer(uint8_t _id)
+{
+    if (_id >= TMR_COUNT) {
+        return 0;
+    }
 
-  if (s_tTmr[_id].Count == 0) {
-    s_tTmr[_id].Flag = 0;
-    return 1;
-  } else {
-    return 0;
-  }
+    if (s_tTmr[_id].Count == 0) {
+        s_tTmr[_id].Flag = 0;
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 /*
@@ -381,12 +393,13 @@ uint8_t bsp_CountTimer(uint8_t _id) {
 *   返 回 值: 返回 0 表示定时未到， 1表示定时到
 *********************************************************************************************************
 */
-uint32_t bsp_RemainTimer(uint8_t _id) {
-  if (_id >= TMR_COUNT) {
-    return 0;
-  }
+uint32_t bsp_RemainTimer(uint8_t _id)
+{
+    if (_id >= TMR_COUNT) {
+        return 0;
+    }
 
-  return s_tTmr[_id].Count;
+    return s_tTmr[_id].Count;
 }
 
 /*
@@ -398,11 +411,12 @@ uint32_t bsp_RemainTimer(uint8_t _id) {
 *   返 回 值: CPU运行时间，单位1ms
 *********************************************************************************************************
 */
-int32_t bsp_GetRunTime(void) {
-  int32_t runtime =
-      g_iRunTime; /* 这个变量在Systick中断中被改写，因此需要关中断进行保护 */
+int32_t bsp_GetRunTime(void)
+{
+    int32_t runtime =
+        g_iRunTime; /* 这个变量在Systick中断中被改写，因此需要关中断进行保护 */
 
-  return runtime;
+    return runtime;
 }
 
 /*
@@ -413,24 +427,25 @@ int32_t bsp_GetRunTime(void) {
 *   返 回 值: 当前时间和过去时间的差值，单位1ms
 *********************************************************************************************************
 */
-int32_t bsp_CheckRunTime(int32_t _LastTime) {
-  int32_t now_time;
-  int32_t time_diff;
+int32_t bsp_CheckRunTime(int32_t _LastTime)
+{
+    int32_t now_time;
+    int32_t time_diff;
 
-  DISABLE_INT(); /* 关中断 */
+    DISABLE_INT(); /* 关中断 */
 
-  now_time =
-      g_iRunTime; /* 这个变量在Systick中断中被改写，因此需要关中断进行保护 */
+    now_time =
+        g_iRunTime; /* 这个变量在Systick中断中被改写，因此需要关中断进行保护 */
 
-  DISABLE_INT(); /* 开中断 */
+    DISABLE_INT(); /* 开中断 */
 
-  if (now_time >= _LastTime) {
-    time_diff = now_time - _LastTime;
-  } else {
-    time_diff = 0x7FFFFFFF - _LastTime + now_time;
-  }
+    if (now_time >= _LastTime) {
+        time_diff = now_time - _LastTime;
+    } else {
+        time_diff = 0x7FFFFFFF - _LastTime + now_time;
+    }
 
-  return time_diff;
+    return time_diff;
 }
 
 /*
@@ -441,12 +456,13 @@ int32_t bsp_CheckRunTime(int32_t _LastTime) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void bsp_SysTick_Handler(void) {
-  if (g_ucEnableSystickISR == 0) {
-    return;
-  }
+void bsp_SysTick_Handler(void)
+{
+    if (g_ucEnableSystickISR == 0) {
+        return;
+    }
 
-  SysTick_ISR(); /* 安富莱bsp库的滴答定时中断服务程序 */
+    SysTick_ISR(); /* 安富莱bsp库的滴答定时中断服务程序 */
 }
 /***************************** 安富莱电子 www.armfly.com (END OF FILE)
  * *********************************/

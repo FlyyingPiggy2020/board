@@ -17,8 +17,8 @@
 #include "stdint.h"
 
 typedef enum {
-  LED_ID1 = 0,
-  LED_IDX,
+    LED_ID1 = 0,
+    LED_IDX,
 } LED_ID_E;
 
 /* 供外部调用的函数声明 */

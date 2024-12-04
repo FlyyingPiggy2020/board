@@ -43,10 +43,10 @@ SOFTWARE.
 
 #if CONFIG_BSP_USE_USART1
 #define uart_num UART_NUM_1
-#define tx_pin CONFIG_USART1_RXIO
-#define rx_pin CONFIG_USART1_RXIO
-#define tx_size CONFIG_USART1_RXBUFF_SIZE
-#define rx_size CONFIG_USART1_TXBUFF_SIZE
+#define tx_pin   CONFIG_USART1_RXIO
+#define rx_pin   CONFIG_USART1_RXIO
+#define tx_size  CONFIG_USART1_RXBUFF_SIZE
+#define rx_size  CONFIG_USART1_TXBUFF_SIZE
 #endif
 
 /*---------- type define ----------*/
@@ -54,21 +54,21 @@ SOFTWARE.
 /*---------- function prototype ----------*/
 /*---------- variable ----------*/
 /*---------- function ----------*/
-void bsp_uart_init(void) {
+void bsp_uart_init(void)
+{
 #if CONFIG_BSP_USE_USART1
-  ESP_LOGI(TAG, "usart1 init");
-  uart_config_t uart_config = {
-      .baud_rate = 115200,
-      .data_bits = UART_DATA_8_BITS,
-      .parity = UART_PARITY_DISABLE,
-      .stop_bits = UART_STOP_BITS_1,
-      .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-      .source_clk = UART_SCLK_DEFAULT,
-  };
-  ESP_ERROR_CHECK(uart_param_config(uart_num, &uart_config));
-  ESP_ERROR_CHECK(uart_set_pin(uart_num, tx_pin, rx_pin, UART_PIN_NO_CHANGE,
-                               UART_PIN_NO_CHANGE));
-  ESP_ERROR_CHECK(uart_driver_install(uart_num, rx_size, tx_size, 0, NULL, 0));
+    ESP_LOGI(TAG, "usart1 init");
+    uart_config_t uart_config = {
+        .baud_rate = 115200,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        .source_clk = UART_SCLK_DEFAULT,
+    };
+    ESP_ERROR_CHECK(uart_param_config(uart_num, &uart_config));
+    ESP_ERROR_CHECK(uart_set_pin(uart_num, tx_pin, rx_pin, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+    ESP_ERROR_CHECK(uart_driver_install(uart_num, rx_size, tx_size, 0, NULL, 0));
 #endif
 }
 /*---------- end of file ----------*/

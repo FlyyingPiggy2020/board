@@ -31,11 +31,12 @@
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void bsp_Init(void) {
-  bsp_InitUart(); /* 串口初始化 */
-  bsp_InitLed();  /* 初始化LED */
-  bsp_InitI2C();  /* 初始化I2C */
-  bsp_InitKey();
+void bsp_Init(void)
+{
+    bsp_InitUart(); /* 串口初始化 */
+    bsp_InitLed();  /* 初始化LED */
+    bsp_InitI2C();  /* 初始化I2C */
+    bsp_InitKey();
 }
 
 /*
@@ -47,19 +48,20 @@ void bsp_Init(void) {
 *       bsp_Error_Handler(__FILE__, __LINE__);
 *********************************************************************************************************
 */
-void bsp_Error_Handler(char *file, uint32_t line) {
-  /*
-      用户可以添加自己的代码报告源代码文件名和代码行号，比如将错误文件和行号打印到串口
-      printf("Wrong parameters value: file %s on line %d\r\n", file, line)
-  */
+void bsp_Error_Handler(char *file, uint32_t line)
+{
+    /*
+        用户可以添加自己的代码报告源代码文件名和代码行号，比如将错误文件和行号打印到串口
+        printf("Wrong parameters value: file %s on line %d\r\n", file, line)
+    */
 
-  /* 这是一个死循环，断言失败时程序会在此处死机，以便于用户查错 */
-  if (line == 0) {
-    return;
-  }
+    /* 这是一个死循环，断言失败时程序会在此处死机，以便于用户查错 */
+    if (line == 0) {
+        return;
+    }
 
-  while (1) {
-  }
+    while (1) {
+    }
 }
 
 /*
@@ -72,11 +74,12 @@ void bsp_Error_Handler(char *file, uint32_t line) {
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void bsp_Idle(void) {
+void bsp_Idle(void)
+{
 /* --- 喂狗 */
 #if !DEBUG
-  extern IWDG_HandleTypeDef hiwdg;
-  HAL_IWDG_Refresh(&hiwdg);
+    extern IWDG_HandleTypeDef hiwdg;
+    HAL_IWDG_Refresh(&hiwdg);
 #endif
 }
 

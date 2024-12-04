@@ -31,7 +31,7 @@ static volatile uint32_t s_uiDelayCount = 0;
 static volatile uint8_t s_ucTimeOutFlag = 0;
 
 /* 定于软件定时器结构体变量 */
-static SOFT_TMR s_tTmr[TMR_COUNT] = { 0 };
+SOFT_TMR s_tTmr[TMR_COUNT] = { 0 };
 
 /*
     全局运行时间，单位1ms
@@ -63,6 +63,7 @@ void bsp_InitTimer(void)
         s_tTmr[i].Mode = TMR_ONCE_MODE; /* 缺省是1次性工作模式 */
     }
 
+    SysTick_Config(SystemCoreClock / 1000);
     g_ucEnableSystickISR = 1; /* 1表示执行systick中断 */
 }
 /*
@@ -75,7 +76,9 @@ void bsp_InitTimer(void)
 *   返 回 值: 无
 *********************************************************************************************************
 */
-void bsp_RunPer100ms(void) {}
+void bsp_RunPer100ms(void)
+{
+}
 
 /*
 *********************************************************************************************************
@@ -89,9 +92,9 @@ void bsp_RunPer100ms(void) {}
 */
 void bsp_RunPer10ms(void)
 {
-    #if (CONFIG_BSP_HARD_KEY_NUM >= 1)
+#if (CONFIG_BSP_HARD_KEY_NUM >= 1)
     bsp_KeyScan10ms();
-    #endif
+#endif
 }
 
 /*
@@ -280,7 +283,7 @@ void bsp_StartTimer(uint8_t _id, uint32_t _period)
     s_tTmr[_id].Flag = 0;             /* 定时时间到标志 */
     s_tTmr[_id].Mode = TMR_ONCE_MODE; /* 1次性工作模式 */
 
-    DISABLE_INT(); /* 开中断 */
+    ENABLE_INT(); /* 开中断 */
 }
 
 /*
@@ -308,7 +311,7 @@ void bsp_StartAutoTimer(uint8_t _id, uint32_t _period)
     s_tTmr[_id].Flag = 0;             /* 定时时间到标志 */
     s_tTmr[_id].Mode = TMR_AUTO_MODE; /* 自动工作模式 */
 
-    DISABLE_INT(); /* 开中断 */
+    ENABLE_INT(); /* 开中断 */
 }
 
 /*
@@ -415,8 +418,7 @@ uint32_t bsp_RemainTimer(uint8_t _id)
 */
 int32_t bsp_GetRunTime(void)
 {
-    int32_t runtime =
-        g_iRunTime; /* 这个变量在Systick中断中被改写，因此需要关中断进行保护 */
+    int32_t runtime = g_iRunTime; /* 这个变量在Systick中断中被改写，因此需要关中断进行保护 */
 
     return runtime;
 }
@@ -436,10 +438,9 @@ int32_t bsp_CheckRunTime(int32_t _LastTime)
 
     DISABLE_INT(); /* 关中断 */
 
-    now_time =
-        g_iRunTime; /* 这个变量在Systick中断中被改写，因此需要关中断进行保护 */
+    now_time = g_iRunTime; /* 这个变量在Systick中断中被改写，因此需要关中断进行保护 */
 
-    DISABLE_INT(); /* 开中断 */
+    ENABLE_INT(); /* 开中断 */
 
     if (now_time >= _LastTime) {
         time_diff = now_time - _LastTime;

@@ -16,7 +16,7 @@
 
 #include "stdint.h"
 #define KEY_FILTER_TIME CONFIG_BSP_KEYFILTER_TIME /* 单位10ms, 滤波时长 */
-#define KEY_LONG_TIME   CONFIG_BSP_KEY_LONG_TIME /* 单位10ms， 认为长按事件 */
+#define KEY_LONG_TIME   CONFIG_BSP_KEY_LONG_TIME  /* 单位10ms， 认为长按事件 */
 
 /*
     每个按键对应1个全局的结构体变量。

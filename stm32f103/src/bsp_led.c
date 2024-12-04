@@ -5,16 +5,14 @@
  * @Date         : 2024-11-26 13:18:49
  * @LastEditors  : FlyyingPiggy2020 154562451@qq.com
  * @LastEditTime : 2024-11-29 11:08:54
- * @Brief        : 
+ * @Brief        :
  */
-
 
 /*---------- includes ----------*/
 #include "bsp.h"
 /*---------- macro ----------*/
 #if (CONFIG_BSP_LED_NUM >= 1)
 #define HARD_LED_NUM CONFIG_BSP_LED_NUM /* 实体灯个数 */
-
 
 /*---------- type define ----------*/
 /*---------- variable prototype ----------*/
@@ -28,8 +26,6 @@ static L_GPIO_T l_gpio_list[HARD_LED_NUM] = { 0 };
 /*---------- function prototype ----------*/
 /*---------- variable ----------*/
 /*---------- function ----------*/
-
-
 
 /**
  * @brief LED初始化
@@ -47,12 +43,11 @@ void bsp_InitLed(void)
     GPIO_InitStruct.Pull = GPIO_PULLDOWN;         /* 上下拉电阻不使能 */
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
 
-    
     _translate_pin_name(CONFIG_BSP_LED1_IO, &l_gpio_list[0].gpio, &l_gpio_list[0].pin);
-    
-    #if (CONFIG_BSP_LED_NUM >= 2)
+
+#if (CONFIG_BSP_LED_NUM >= 2)
     _translate_pin_name(CONFIG_BSP_LED2_IO, &l_gpio_list[1].gpio, &l_gpio_list[1].pin);
-    #endif
+#endif
     for (i = 0; i < HARD_LED_NUM; i++) {
         GPIO_InitStruct.Pin = l_gpio_list[i].pin;
         HAL_GPIO_Init(l_gpio_list[i].gpio, &GPIO_InitStruct);
@@ -70,7 +65,6 @@ void bsp_LedOn(uint8_t _no)
         l_gpio_list[_no].gpio->BSRR = l_gpio_list[_no].pin << 16U;
     }
 }
-
 
 /**
  * @brief 熄灭指定的LED指示灯。
@@ -96,7 +90,6 @@ void bsp_LedToggle(uint8_t _no)
     }
 }
 
-
 /**
  * @brief 判断LED指示灯是否已经点亮。
  * @param {uint8_t} _no
@@ -115,5 +108,3 @@ uint8_t bsp_IsLedOn(uint8_t _no)
 }
 /*---------- end of file ----------*/
 #endif
-
-

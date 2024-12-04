@@ -139,6 +139,42 @@ menu "STM32F103 BOARD"
     endmenu
 
     menu "ADC Configuration"
+        config BSP_ADC_CH_MAX
+            int "Number of ADCs Channel"
+            default 2
+            range 0 2
+            help 
+                This option sets the number of the ADCs in the system.Default use ADC1 and DMA1.
+
+        config BSP_ADC_FILTER_COUNT
+            int "ADC Filter Count"
+            default 5
+            range 3 10
+            help 
+                This option sets the ADC filter count.Min count is 3.
+        
+                
+        if BSP_ADC_CH_MAX >= 1
+            config BSP_USE_POWER_CHECK
+                bool "Use Power Check"
+                default n
+                help
+                    Enable power check
+
+            config BSP_ADC1_CH1_IO
+                string "ADC1 Channel GPIO1.The GPIO will be used as a PD IO if Power Check is enabled."
+                default "A.00"
+                help
+                    Select the GPIO for ADC1 Channel.
+        endif
+            
+        if BSP_ADC_CH_MAX >= 2
+            config BSP_ADC1_CH2_IO
+                string "ADC1 Channel GPIO"
+                default "A.01"
+                help
+                    Select the GPIO for ADC1 Channel
+        endif
     endmenu
     
     menu "KEY Configuration"

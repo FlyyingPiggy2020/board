@@ -4,7 +4,7 @@
  * @Author       : lxf
  * @Date         : 2024-11-26 15:36:00
  * @LastEditors  : FlyyingPiggy2020 154562451@qq.com
- * @LastEditTime : 2024-11-29 08:27:20
+ * @LastEditTime : 2024-12-03 10:36:52
  * @Brief        : stm32f103串口驱动程序
  * 更新日志：
  * 2024-11-26   lxf     魔改自安富莱串口驱动程序，支持了通过字符串配置串口
@@ -565,7 +565,7 @@ static void InitHardUart(void)
         if (!_translate_pin_name(CONFIG_BSP_USART3_TX_IO, &tx_port, &tx_pin) || !_translate_pin_name(CONFIG_BSP_USART3_RX_IO, &rx_port, &rx_pin)) {
             break;
         } /* 使能 USARTx 时钟 */
-        __HAL_RCC_USART2_CLK_ENABLE();
+        __HAL_RCC_USART3_CLK_ENABLE();
 
         /* 配置TX引脚 */
         GPIO_InitStruct.Pin = tx_pin;

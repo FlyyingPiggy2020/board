@@ -53,6 +53,7 @@ extern "C" {
 
 #include "bsp_config.h"
 /* 通过取消注释或者添加注释的方式控制是否包含底层驱动模块 */
+#include "bsp_adc.h"
 #include "bsp_i2c_eeprom_24xx.h"
 #include "bsp_i2c_gpio.h"
 #include "bsp_key.h"

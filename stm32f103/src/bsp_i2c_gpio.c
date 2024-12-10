@@ -48,20 +48,20 @@
 #define I2C_SDA_PIN   GPIO_PIN_15 /* 连接到SDA数据线的GPIO */
 
 /* 定义读写SCL和SDA的宏 */
-#define I2C_VCC_1()   GPIO_PORT_VCC->BSRR = (uint32_t)I2C_VCC_PIN /* VCC = 1 */
+#define I2C_VCC_1()   GPIO_PORT_VCC->BSRR = (uint32_t)I2C_VCC_PIN        /* VCC = 1 */
 #define I2C_VCC_0()   GPIO_PORT_VCC->BSRR = (uint32_t)I2C_VCC_PIN << 16U /* VCC = 0 */
 
-#define I2C_WP_1() GPIO_PORT_I2C->BSRR = (uint32_t)I2C_WP_PIN /* WP = 1 */
-#define I2C_WP_0() GPIO_PORT_I2C->BSRR = (uint32_t)I2C_WP_PIN << 16U /* WP = 0 */
+#define I2C_WP_1()    GPIO_PORT_I2C->BSRR = (uint32_t)I2C_WP_PIN        /* WP = 1 */
+#define I2C_WP_0()    GPIO_PORT_I2C->BSRR = (uint32_t)I2C_WP_PIN << 16U /* WP = 0 */
 
-#define I2C_SCL_1() GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SCL_PIN /* SCL = 1 */
-#define I2C_SCL_0() GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SCL_PIN << 16U /* SCL = 0 */
+#define I2C_SCL_1()   GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SCL_PIN        /* SCL = 1 */
+#define I2C_SCL_0()   GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SCL_PIN << 16U /* SCL = 0 */
 
-#define I2C_SDA_1() GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SDA_PIN /* SDA = 1 */
-#define I2C_SDA_0() GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SDA_PIN << 16U /* SDA = 0 */
+#define I2C_SDA_1()   GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SDA_PIN        /* SDA = 1 */
+#define I2C_SDA_0()   GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SDA_PIN << 16U /* SDA = 0 */
 
 #define I2C_WP_READ() \
-    ((GPIO_PORT_I2C->IDR & I2C_WP_PIN) != 0) /* 读WP口线状态 */
+    ((GPIO_PORT_I2C->IDR & I2C_WP_PIN) != 0)                     /* 读WP口线状态 */
 #define I2C_SDA_READ() ((GPIO_PORT_I2C->IDR & I2C_SDA_PIN) != 0) /* 读SDA口线状态 */
 #define I2C_SCL_READ() ((GPIO_PORT_I2C->IDR & I2C_SCL_PIN) != 0) /* 读SCL口线状态 */
 
@@ -108,9 +108,9 @@ void bsp_InitI2C(void)
     i2c_WPDisable();
     /* 给一个停止信号, 复位I2C总线上的所有设备到待机模式 */
     i2c_Stop();
-    /* 检测芯片是否正常 */
-    if (ee_CheckOk() < 0) {
-    }
+    //    /* 检测芯片是否正常 */
+    //    if (ee_CheckOk() < 0) {
+    //    }
 }
 /*
 *********************************************************************************************************

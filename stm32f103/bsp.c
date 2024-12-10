@@ -39,7 +39,6 @@ void bsp_Init(void)
 #if (CONFIG_BSP_LED_NUM >= 1)
     bsp_InitLed();
 #endif
-    bsp_InitI2C();
 #if (CONFIG_BSP_HARD_KEY_NUM >= 1)
     bsp_InitKey();
 #endif

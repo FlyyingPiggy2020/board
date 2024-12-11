@@ -78,6 +78,10 @@ void bsp_InitTimer(void)
 */
 void bsp_RunPer100ms(void)
 {
+#if !DEBUG
+    extern IWDG_HandleTypeDef hiwdg;
+    HAL_IWDG_Refresh(&hiwdg);
+#endif
 }
 
 /*

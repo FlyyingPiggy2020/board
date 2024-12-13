@@ -4,7 +4,7 @@
  * @Author       : lxf
  * @Date         : 2024-11-26 15:36:00
  * @LastEditors  : FlyyingPiggy2020 154562451@qq.com
- * @LastEditTime : 2024-12-03 10:36:52
+ * @LastEditTime : 2024-12-13 08:02:58
  * @Brief        : stm32f103串口驱动程序
  * 更新日志：
  * 2024-11-26   lxf     魔改自安富莱串口驱动程序，支持了通过字符串配置串口
@@ -19,8 +19,8 @@
 /*---------- variable prototype ----------*/
 #if CONFIG_BSP_UART1_EN == 1
 static UART_T g_tUart1;
-static uint8_t g_TxBuf1[CONFIG_BSP_UART1_TX_BUF_SIZE]; /* 发送缓冲区 */
-static uint8_t g_RxBuf1[CONFIG_BSP_UART1_RX_BUF_SIZE]; /* 接收缓冲区 */
+uint8_t g_TxBuf1[CONFIG_BSP_UART1_TX_BUF_SIZE]; /* 发送缓冲区 */
+uint8_t g_RxBuf1[CONFIG_BSP_UART1_RX_BUF_SIZE]; /* 接收缓冲区 */
 #endif
 
 #if CONFIG_BSP_UART2_EN == 1
@@ -30,9 +30,9 @@ uint8_t g_RxBuf2[CONFIG_BSP_UART2_RX_BUF_SIZE]; /* 接收缓冲区 */
 #endif
 
 #if CONFIG_BSP_UART3_EN == 1
-static UART_T g_tUart3;
-static uint8_t g_TxBuf3[CONFIG_BSP_UART3_TX_BUF_SIZE]; /* 发送缓冲区 */
-static uint8_t g_RxBuf3[CONFIG_BSP_UART3_RX_BUF_SIZE]; /* 接收缓冲区 */
+UART_T g_tUart3;
+uint8_t g_TxBuf3[CONFIG_BSP_UART3_TX_BUF_SIZE]; /* 发送缓冲区 */
+uint8_t g_RxBuf3[CONFIG_BSP_UART3_RX_BUF_SIZE]; /* 接收缓冲区 */
 #endif
 
 #if CONFIG_BSP_USART1_485_EN == 1
@@ -442,6 +442,7 @@ static void UartVarInit(void)
     g_tUart3.SendOver = RS485_SendOver;                  /* 发送完毕后的回调函数 */
     g_tUart3.ReciveNew = 0;                              /* 接收到新数据后的回调函数 */
     g_tUart3.Sending = 0;                                /* 正在发送中标志 */
+    g_tUart3.IdleCallback = 0;
 #endif
 }
 
@@ -519,8 +520,8 @@ static void InitHardUart(void)
 
         CLEAR_BIT(USART1->SR, USART_SR_TC);   /* 清除TC发送完成标志 */
         CLEAR_BIT(USART1->SR, USART_SR_RXNE); /* 清除RXNE接收标志 */
-        // USART_CR1_PEIE | USART_CR1_RXNEIE
         SET_BIT(USART1->CR1, USART_CR1_RXNEIE); /* 使能PE. RX接受中断 */
+        SET_BIT(USART1->CR1, USART_CR1_IDLEIE);
     } while (0);
 #endif
 
@@ -589,6 +590,7 @@ static void InitHardUart(void)
         CLEAR_BIT(USART3->SR, USART_SR_TC);     /* 清除TC发送完成标志 */
         CLEAR_BIT(USART3->SR, USART_SR_RXNE);   /* 清除RXNE接收标志 */
         SET_BIT(USART3->CR1, USART_CR1_RXNEIE); /* 使能PE. RX接受中断 */
+        SET_BIT(USART3->CR1, USART_CR1_IDLEIE);
     } while (0);
 
 #endif

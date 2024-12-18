@@ -4,7 +4,7 @@
  * @Author       : lxf
  * @Date         : 2024-11-26 13:18:49
  * @LastEditors  : FlyyingPiggy2020 154562451@qq.com
- * @LastEditTime : 2024-11-27 17:07:08
+ * @LastEditTime : 2024-12-16 17:14:34
  * @Brief        :
  */
 
@@ -49,7 +49,10 @@ typedef struct {
     void (*SendOver)(COM_PORT_E com);                 /* 发送完毕的回调函数指针（主要用于RS485将发送模式切换为接收模式）*/
     void (*ReciveNew)(COM_PORT_E com, uint8_t _byte); /* 串口收到数据的回调函数指针 */
     void (*IdleCallback)(void);                       /* 空闲中断回调 */
-    uint8_t Sending;                                  /* 正在发送中 */
+    void (*half_bus_err)(uint8_t ch, uint8_t err);
+    uint8_t Sending;       /* 正在发送中 */
+    __IO uint16_t usTxPos; /* 发送数据位置 */
+    __IO uint16_t usTxCnt; /* 比较数据位置 */
 } UART_T;
 
 /*---------- variable prototype ----------*/

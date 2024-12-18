@@ -60,7 +60,7 @@ extern "C" {
 #include "bsp_led.h"
 #include "bsp_timer.h"
 #include "bsp_uart_fifo.h"
-
+#include "dt3_5.h"
 /* 提供给其他C文件调用的函数 */
 void bsp_Init(void);
 void bsp_Idle(void);

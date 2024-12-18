@@ -26,16 +26,7 @@
         */
 
 typedef enum {
-    TMR_ID_SYS_RESET = 0,         /* led超时延时 */
-    TMR_ID_MOBUS_REPEAT,          /* mobus超时延时 */
-    TMR_ID_ZIG_THREAD,            /* zigbee线程延时 */
-    TMR_ID_ZIG_TIMEOUT,           /* zigbee超时延时 */
-    TMR_ID_UPG_TIMEOUT,           /* zigbee升级超时 */
-    TMR_ID_CRYPOR_TIMEOUT,        /* 加密随机时间 */
-    TMR_ID_UPLOAD_TIMEOUT,        /* 上报信息时间 */
-    TMR_ID_RFMODE_TIMEOUT,        /* 搜索信息时间 */
-    TMR_ID_PROTOCOL_TRANS_THREAD, /* 协议发送 */
-    TMR_ID_LED_FLASH_THREAD,      /* LED闪烁 */
+    TMR_ID_RS485_TRANS_THREAD, /* 协议发送 */
 } TMR_CNT_ID;
 
 /* 定时器宏定义 */

@@ -234,4 +234,21 @@ menu "STM32F103 BOARD"
                     Select the GPIO for LED 2
         endif
     endmenu
+
+    menu "TIMER Configuration"
+        config BSP_HARD_TIMER_EN
+            bool "Enable hardware timer (for microsecond level timeout callback)"
+            default y
+            help 
+                Enable hardware timer for microsecond level timeout callback
+            
+            if BSP_HARD_TIMER_EN
+                config BSP_HARD_TIMER_BASE
+                    int "Timer base"
+                    default 2
+                    range 2 4
+                    help
+                        TIM2,TIM3,TIM4...
+            endif
+    endmenu
 endmenu

@@ -4,7 +4,7 @@
  * @Author       : lxf
  * @Date         : 2024-11-26 15:36:00
  * @LastEditors  : FlyyingPiggy2020 154562451@qq.com
- * @LastEditTime : 2024-12-13 08:02:58
+ * @LastEditTime : 2024-12-16 17:30:54
  * @Brief        : stm32f103串口驱动程序
  * 更新日志：
  * 2024-11-26   lxf     魔改自安富莱串口驱动程序，支持了通过字符串配置串口
@@ -18,7 +18,7 @@
 /*---------- type define ----------*/
 /*---------- variable prototype ----------*/
 #if CONFIG_BSP_UART1_EN == 1
-static UART_T g_tUart1;
+UART_T g_tUart1;
 uint8_t g_TxBuf1[CONFIG_BSP_UART1_TX_BUF_SIZE]; /* 发送缓冲区 */
 uint8_t g_RxBuf1[CONFIG_BSP_UART1_RX_BUF_SIZE]; /* 接收缓冲区 */
 #endif
@@ -36,6 +36,7 @@ uint8_t g_RxBuf3[CONFIG_BSP_UART3_RX_BUF_SIZE]; /* 接收缓冲区 */
 #endif
 
 #if CONFIG_BSP_USART1_485_EN == 1
+
 #endif
 
 #if CONFIG_BSP_USART2_485_EN == 1
@@ -263,6 +264,8 @@ void comClearTxFifo(COM_PORT_E _ucPort)
     pUart->usTxWrite = 0;
     pUart->usTxRead = 0;
     pUart->usTxCount = 0;
+    pUart->usTxPos = 0;
+    pUart->usTxCnt = 0;
 }
 
 /**
@@ -320,6 +323,7 @@ static bool _rs485_txe_init(const char *name)
     HAL_GPIO_Init(io_port, &gpio_init);
     return true;
 }
+void RS485_RX_EN(COM_PORT_E com);
 /**
  * @brief 配置485发送使能
  * @return {*}
@@ -328,20 +332,75 @@ void RS485_InitTXE(void)
 {
 #if CONFIG_BSP_USART1_485_EN == 1
     _rs485_txe_init(CONFIG_BSP_USART1_485_TXE_IO);
+    RS485_RX_EN(COM1);
+#endif
+#if CONFIG_BSP_USART2_485_EN == 1
+    _rs485_txe_init(CONFIG_BSP_USART2_485_TXE_IO);
+    RS485_RX_EN(COM2);
+#endif
+#if CONFIG_BSP_USART3_485_EN == 1
+    _rs485_txe_init(CONFIG_BSP_USART3_485_TXE_IO);
+    RS485_RX_EN(COM3);
 #endif
 }
 
 void RS485_TX_EN(COM_PORT_E com)
 {
-    if (com == COM3) {
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_RESET);
+    GPIO_InitTypeDef gpio_init;
+    GPIO_TypeDef *io_port;
+    uint32_t io_pin;
+
+    if (com == COM1) {
+#if CONFIG_BSP_USART1_485_EN == 1
+        if (!_translate_pin_name(CONFIG_BSP_USART1_485_TXE_IO, &io_port, &io_pin)) {
+            return;
+        }
+        HAL_GPIO_WritePin(io_port, io_pin, CONFIG_BSP_USART1_485_TX_EN_LEVEL);
+#endif
+    } else if (com == COM2) {
+#if CONFIG_BSP_USART2_485_EN == 1
+        if (!_translate_pin_name(CONFIG_BSP_USART2_485_TXE_IO, &io_port, &io_pin)) {
+            return;
+        }
+        HAL_GPIO_WritePin(io_port, io_pin, CONFIG_BSP_USART2_485_TX_EN_LEVEL);
+#endif
+    } else if (com == COM3) {
+#if CONFIG_BSP_USART3_485_EN == 1
+        if (!_translate_pin_name(CONFIG_BSP_USART3_485_TXE_IO, &io_port, &io_pin)) {
+            return;
+        }
+        HAL_GPIO_WritePin(io_port, io_pin, CONFIG_BSP_USART3_485_TX_EN_LEVEL);
+#endif
     }
 }
 
 void RS485_RX_EN(COM_PORT_E com)
 {
-    if (com == COM3) {
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, GPIO_PIN_SET);
+    GPIO_InitTypeDef gpio_init;
+    GPIO_TypeDef *io_port;
+    uint32_t io_pin;
+
+    if (com == COM1) {
+#if CONFIG_BSP_USART1_485_EN == 1
+        if (!_translate_pin_name(CONFIG_BSP_USART1_485_TXE_IO, &io_port, &io_pin)) {
+            return;
+        }
+        HAL_GPIO_WritePin(io_port, io_pin, !CONFIG_BSP_USART1_485_TX_EN_LEVEL);
+#endif
+    } else if (com == COM2) {
+#if CONFIG_BSP_USART2_485_EN == 1
+        if (!_translate_pin_name(CONFIG_BSP_USART2_485_TXE_IO, &io_port, &io_pin)) {
+            return;
+        }
+        HAL_GPIO_WritePin(io_port, io_pin, !CONFIG_BSP_USART2_485_TX_EN_LEVEL);
+#endif
+    } else if (com == COM3) {
+#if CONFIG_BSP_USART3_485_EN == 1
+        if (!_translate_pin_name(CONFIG_BSP_USART3_485_TXE_IO, &io_port, &io_pin)) {
+            return;
+        }
+        HAL_GPIO_WritePin(io_port, io_pin, !CONFIG_BSP_USART3_485_TX_EN_LEVEL);
+#endif
     }
 }
 /**
@@ -512,14 +571,14 @@ static void InitHardUart(void)
         HAL_GPIO_Init(rx_port, &GPIO_InitStruct);
 
         /* 配置NVIC the NVIC for UART */
-        HAL_NVIC_SetPriority(USART1_IRQn, 0, 2);
+        HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
         HAL_NVIC_EnableIRQ(USART1_IRQn);
 
         /* 配置波特率、奇偶校验 */
         comSetUartParam(USART1, CONFIG_BSP_UART1_BAUD, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX);
 
-        CLEAR_BIT(USART1->SR, USART_SR_TC);   /* 清除TC发送完成标志 */
-        CLEAR_BIT(USART1->SR, USART_SR_RXNE); /* 清除RXNE接收标志 */
+        CLEAR_BIT(USART1->SR, USART_SR_TC);     /* 清除TC发送完成标志 */
+        CLEAR_BIT(USART1->SR, USART_SR_RXNE);   /* 清除RXNE接收标志 */
         SET_BIT(USART1->CR1, USART_CR1_RXNEIE); /* 使能PE. RX接受中断 */
         SET_BIT(USART1->CR1, USART_CR1_IDLEIE);
     } while (0);
@@ -547,7 +606,7 @@ static void InitHardUart(void)
         HAL_GPIO_Init(rx_port, &GPIO_InitStruct);
 
         /* 配置NVIC the NVIC for UART */
-        HAL_NVIC_SetPriority(USART2_IRQn, 0, 2);
+        HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
         HAL_NVIC_EnableIRQ(USART2_IRQn);
 
         /* 配置波特率、奇偶校验 */
@@ -581,7 +640,7 @@ static void InitHardUart(void)
         HAL_GPIO_Init(rx_port, &GPIO_InitStruct);
 
         /* 配置NVIC the NVIC for UART */
-        HAL_NVIC_SetPriority(USART3_IRQn, 0, 1);
+        HAL_NVIC_SetPriority(USART3_IRQn, 0, 0);
         HAL_NVIC_EnableIRQ(USART3_IRQn);
 
         /* 配置波特率、奇偶校验 */
@@ -778,7 +837,7 @@ uint8_t comTxEmpty(COM_PORT_E _ucPort)
     }
     return 1;
 }
-
+#define COMx_485 COM1
 /*
 *********************************************************************************************************
 *   函 数 名: UartIRQ
@@ -792,54 +851,67 @@ static void UartIRQ(UART_T *_pUart)
     uint32_t isrflags = READ_REG(_pUart->uart->SR);
     uint32_t cr1its = READ_REG(_pUart->uart->CR1);
     uint32_t cr3its = READ_REG(_pUart->uart->CR3);
-
     /* 处理接收中断  */
     if ((isrflags & USART_SR_RXNE) != RESET) {
         /* 从串口接收数据寄存器读取数据存放到接收FIFO */
         uint8_t ch;
 
         ch = READ_REG(_pUart->uart->DR);
-        if (_pUart->usRxCount < _pUart->usRxBufSize) {
-            _pUart->pRxBuf[_pUart->usRxWrite] = ch;
-            if (++_pUart->usRxWrite >= _pUart->usRxBufSize) {
-                _pUart->usRxWrite = 0;
+        if (_pUart->com == COMx_485) {
+            if (_pUart->usTxCnt < _pUart->usTxPos) {
+                if (ch == _pUart->pTxBuf[_pUart->usTxCnt]) {
+                    _pUart->usTxCnt++;
+                    if (_pUart->Sending == 0 && _pUart->usTxPos == _pUart->usTxCnt) {
+                        comClearTxFifo(_pUart->com);
+                    }
+                } else {
+                    comClearTxFifo(_pUart->com);
+                    CLEAR_BIT(_pUart->uart->CR1, USART_CR1_TXEIE);
+                    SET_BIT(_pUart->uart->CR1, USART_CR1_TCIE);
+                    if (_pUart->half_bus_err) {
+                        _pUart->half_bus_err(ch, _pUart->pTxBuf[_pUart->usTxCnt]);
+                    }
+                }
+            } else if (_pUart->Sending == 0) {
+                if (_pUart->usRxCount < _pUart->usRxBufSize) {
+                    _pUart->pRxBuf[_pUart->usRxWrite] = ch;
+                    if (++_pUart->usRxWrite >= _pUart->usRxBufSize) {
+                        _pUart->usRxWrite = 0;
+                    }
+                    _pUart->usRxCount++;
+                }
             }
-            _pUart->usRxCount++;
+        } else {
+            if (_pUart->usRxCount < _pUart->usRxBufSize) {
+                _pUart->pRxBuf[_pUart->usRxWrite] = ch;
+                if (++_pUart->usRxWrite >= _pUart->usRxBufSize) {
+                    _pUart->usRxWrite = 0;
+                }
+                _pUart->usRxCount++;
+            }
         }
-
-        /* 回调函数,通知应用程序收到新数据,一般是发送1个消息或者设置一个标记 */
-        // if (_pUart->usRxWrite == _pUart->usRxRead)
-        // if (_pUart->usRxCount == 1)
-        {
-            if (_pUart->ReciveNew) {
-                _pUart->ReciveNew(_pUart->com,
-                                  ch); /* 比如，交给MODBUS解码程序处理字节流 */
-            }
+        if (_pUart->ReciveNew) {
+            _pUart->ReciveNew(_pUart->com, ch); /* 比如，交给MODBUS解码程序处理字节流 */
         }
     }
 
     /* 处理发送缓冲区空中断 */
     if (((isrflags & USART_SR_TXE) != RESET) && (cr1its & USART_CR1_TXEIE) != RESET) {
-        // if (_pUart->usTxRead == _pUart->usTxWrite)
+        _pUart->Sending = 1;
         if (_pUart->usTxCount == 0) {
-            /* 发送缓冲区的数据已取完时， 禁止发送缓冲区空中断
-             * （注意：此时最后1个数据还未真正发送完毕）*/
-            // USART_ITConfig(_pUart->uart, USART_IT_TXE, DISABLE);
+            /* 发送缓冲区的数据已取完时， 禁止发送缓冲区空中断 （注意：此时最后1个数据还未真正发送完毕）*/
             CLEAR_BIT(_pUart->uart->CR1, USART_CR1_TXEIE);
 
             /* 使能数据发送完毕中断 */
-            // USART_ITConfig(_pUart->uart, USART_IT_TC, ENABLE);
             SET_BIT(_pUart->uart->CR1, USART_CR1_TCIE);
         } else {
-            _pUart->Sending = 1;
-
             /* 从发送FIFO取1个字节写入串口发送数据寄存器 */
-            // USART_SendData(_pUart->uart, _pUart->pTxBuf[_pUart->usTxRead]);
             _pUart->uart->DR = _pUart->pTxBuf[_pUart->usTxRead];
             if (++_pUart->usTxRead >= _pUart->usTxBufSize) {
                 _pUart->usTxRead = 0;
             }
             _pUart->usTxCount--;
+            _pUart->usTxPos++;
         }
     }
     /* 数据bit位全部发送完毕的中断 */
@@ -847,35 +919,31 @@ static void UartIRQ(UART_T *_pUart)
         // if (_pUart->usTxRead == _pUart->usTxWrite)
         if (_pUart->usTxCount == 0) {
             /* 如果发送FIFO的数据全部发送完毕，禁止数据发送完毕中断 */
-            // USART_ITConfig(_pUart->uart, USART_IT_TC, DISABLE);
             CLEAR_BIT(_pUart->uart->CR1, USART_CR1_TCIE);
 
-            /* 回调函数,
-             * 一般用来处理RS485通信，将RS485芯片设置为接收模式，避免抢占总线 */
+            /* 回调函数, 一般用来处理RS485通信，将RS485芯片设置为接收模式，避免抢占总线 */
             if (_pUart->SendOver) {
                 _pUart->SendOver(_pUart->com);
             }
-
             _pUart->Sending = 0;
         } else {
             /* 正常情况下，不会进入此分支 */
-
             /* 如果发送FIFO的数据还未完毕，则从发送FIFO取1个数据写入发送数据寄存器 */
-            // USART_SendData(_pUart->uart, _pUart->pTxBuf[_pUart->usTxRead]);
             _pUart->uart->DR = _pUart->pTxBuf[_pUart->usTxRead];
             if (++_pUart->usTxRead >= _pUart->usTxBufSize) {
                 _pUart->usTxRead = 0;
             }
             _pUart->usTxCount--;
+            _pUart->usTxPos++;
         }
     }
     if ((isrflags & USART_SR_IDLE) != RESET) {
+        CLEAR_BIT(_pUart->uart->SR, USART_SR_IDLE);
         __attribute__((unused)) uint8_t ch;
+        ch = READ_REG(_pUart->uart->DR);
         if (_pUart->IdleCallback != 0) {
             _pUart->IdleCallback();
         }
-        ch = READ_REG(_pUart->uart->DR);
-        CLEAR_BIT(_pUart->uart->SR, USART_SR_IDLE);
     }
 }
 

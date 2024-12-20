@@ -27,6 +27,7 @@
 
 typedef enum {
     TMR_ID_RS485_TRANS_THREAD, /* 协议发送 */
+    TMR_ID_PLC_TRANS_THREAD,
 } TMR_CNT_ID;
 
 /* 定时器宏定义 */

@@ -121,7 +121,7 @@ void bsp_adc_init(void)
 #endif
 }
 
-#if CONFIG_BSP_ADC_CH_MAX >= 1
+#if (CONFIG_BSP_ADC_CH_MAX >= 1) && (!CONFIG_BSP_USE_CUBEMX_CONFIG_ADC_DMA)
 /**
  * @brief This function handles DMA1 channel1 global interrupt.
  */

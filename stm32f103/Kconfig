@@ -155,6 +155,13 @@ menu "STM32F103 BOARD"
         
                 
         if BSP_ADC_CH_MAX >= 1
+        
+            config BSP_USE_CUBEMX_CONFIG_ADC_DMA
+                bool "Config ADC DMA with CubeMX"
+                default y
+                help 
+                    Config ADC DMA with CubeMX
+
             config BSP_USE_POWER_CHECK
                 bool "Use Power Check"
                 default n
@@ -250,5 +257,13 @@ menu "STM32F103 BOARD"
                     help
                         TIM2,TIM3,TIM4...
             endif
+    endmenu
+
+    menu "IWDG Configuration"
+        config BSP_HARD_IWDG_EN
+            bool "Enable hardware IWDG"
+            default y
+            help 
+                Enable hardware IWDG
     endmenu
 endmenu

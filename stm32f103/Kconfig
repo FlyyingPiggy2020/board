@@ -191,6 +191,7 @@ menu "STM32F103 BOARD"
             range 0 1
             help 
                 This option sets the number of phyiscal keys in the system.
+
         config BSP_KEYFILTER_TIME
             int "Key Filter Time. unit:10ms"
             default 5

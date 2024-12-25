@@ -52,7 +52,9 @@ static int32_t UartSend(UART_T *_pUart, uint8_t *_ucaBuf, uint16_t _usLen);
 static uint8_t UartGetChar(UART_T *_pUart, uint8_t *_pByte);
 static uint16_t UartGetBuf(UART_T *_pUart, uint8_t *_ucaBuf, uint16_t _usLen);
 static uint16_t UartSetBuf(UART_T *_pUart, uint8_t *_ucaBuf, uint16_t _usLen);
+#if (CONFIG_BSP_UART1_EN == 1) || (CONFIG_BSP_UART2_EN == 1) || (CONFIG_BSP_UART3_EN == 1)
 static void UartIRQ(UART_T *_pUart);
+#endif
 void RS485_InitTXE(void);
 void RS485_SendBefor(COM_PORT_E com);
 void RS485_SendOver(COM_PORT_E com);
@@ -304,7 +306,7 @@ void comSetBaud(COM_PORT_E _ucPort, uint32_t _BaudRate)
 
     comSetUartParam(USARTx, _BaudRate, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX);
 }
-
+#if (CONFIG_BSP_USART1_485_EN == 1) || (CONFIG_BSP_USART2_485_EN == 1) || (CONFIG_BSP_USART3_485_EN == 1)
 static bool _rs485_txe_init(const char *name)
 {
     GPIO_InitTypeDef gpio_init;
@@ -323,6 +325,7 @@ static bool _rs485_txe_init(const char *name)
     HAL_GPIO_Init(io_port, &gpio_init);
     return true;
 }
+#endif
 void RS485_RX_EN(COM_PORT_E com);
 /**
  * @brief 配置485发送使能
@@ -346,10 +349,10 @@ void RS485_InitTXE(void)
 
 void RS485_TX_EN(COM_PORT_E com)
 {
+#if (CONFIG_BSP_USART1_485_EN == 1) || (CONFIG_BSP_USART2_485_EN == 1) || (CONFIG_BSP_USART3_485_EN == 1)
     GPIO_InitTypeDef gpio_init;
     GPIO_TypeDef *io_port;
     uint32_t io_pin;
-
     if (com == COM1) {
 #if CONFIG_BSP_USART1_485_EN == 1
         if (!_translate_pin_name(CONFIG_BSP_USART1_485_TXE_IO, &io_port, &io_pin)) {
@@ -372,10 +375,12 @@ void RS485_TX_EN(COM_PORT_E com)
         HAL_GPIO_WritePin(io_port, io_pin, CONFIG_BSP_USART3_485_TX_EN_LEVEL);
 #endif
     }
+#endif
 }
 
 void RS485_RX_EN(COM_PORT_E com)
 {
+#if (CONFIG_BSP_USART1_485_EN == 1) || (CONFIG_BSP_USART2_485_EN == 1) || (CONFIG_BSP_USART3_485_EN == 1)
     GPIO_InitTypeDef gpio_init;
     GPIO_TypeDef *io_port;
     uint32_t io_pin;
@@ -402,6 +407,7 @@ void RS485_RX_EN(COM_PORT_E com)
         HAL_GPIO_WritePin(io_port, io_pin, !CONFIG_BSP_USART3_485_TX_EN_LEVEL);
 #endif
     }
+#endif
 }
 /**
  * @brief 修改串口的波特率。
@@ -545,6 +551,7 @@ void comSetUartParam(USART_TypeDef *Instance, uint32_t BaudRate, uint16_t WordLe
 */
 static void InitHardUart(void)
 {
+#if (CONFIG_BSP_UART1_EN == 1) || (CONFIG_BSP_UART2_EN == 1) || (CONFIG_BSP_UART3_EN == 1)
     GPIO_InitTypeDef GPIO_InitStruct;
     GPIO_TypeDef *tx_port, *rx_port;
     uint32_t tx_pin, rx_pin;
@@ -652,6 +659,7 @@ static void InitHardUart(void)
         SET_BIT(USART3->CR1, USART_CR1_IDLEIE);
     } while (0);
 
+#endif
 #endif
 }
 
@@ -837,7 +845,9 @@ uint8_t comTxEmpty(COM_PORT_E _ucPort)
     }
     return 1;
 }
-#define COMx_485 COM1
+#define COMx_485 COM1//TODO:
+
+#if (CONFIG_BSP_UART1_EN == 1) || (CONFIG_BSP_UART2_EN == 1) || (CONFIG_BSP_UART3_EN == 1)
 /*
 *********************************************************************************************************
 *   函 数 名: UartIRQ
@@ -946,7 +956,7 @@ static void UartIRQ(UART_T *_pUart)
         }
     }
 }
-
+#endif
 /*
 *********************************************************************************************************
 *   函 数 名: USART1_IRQHandler  USART2_IRQHandler USART3_IRQHandler

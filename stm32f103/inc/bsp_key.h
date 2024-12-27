@@ -14,7 +14,9 @@
 #ifndef __BSP_KEY_H
 #define __BSP_KEY_H
 
-#include "stdint.h"
+#include "bsp_config.h"
+#include <stdint.h>
+
 #define KEY_FILTER_TIME CONFIG_BSP_KEYFILTER_TIME /* 单位10ms, 滤波时长 */
 #define KEY_LONG_TIME   CONFIG_BSP_KEY_LONG_TIME  /* 单位10ms， 认为长按事件 */
 
@@ -44,13 +46,14 @@ typedef enum {
 
 /* 按键FIFO用到变量 */
 #define KEY_FIFO_SIZE 10
+#if (CONFIG_BSP_USE_RTOS == 0)
 typedef struct {
     uint8_t Buf[KEY_FIFO_SIZE]; /* 键值缓冲区 */
     uint8_t Read;               /* 缓冲区读指针1 */
     uint8_t Write;              /* 缓冲区写指针 */
     uint8_t Read2;              /* 缓冲区读指针2 */
 } KEY_FIFO_T;
-
+#endif
 /* 供外部调用的函数声明 */
 void bsp_InitKey(void);
 void bsp_KeyScan10ms(void);

@@ -4,7 +4,7 @@
  * @Author       : lxf
  * @Date         : 2024-11-26 13:18:49
  * @LastEditors  : FlyyingPiggy2020 154562451@qq.com
- * @LastEditTime : 2024-11-29 08:34:52
+ * @LastEditTime : 2024-12-26 09:29:57
  * @Brief        : 按键驱动魔改自安富莱
  */
 
@@ -16,6 +16,7 @@
 /*---------- variable prototype ----------*/
 /*---------- function prototype ----------*/
 /*---------- variable ----------*/
+static QueueHandle_t s_KeyQueue = NULL;
 /*---------- function ----------*/
 /*---------- end of file ----------*/
 
@@ -36,7 +37,10 @@ static X_GPIO_T s_gpio_list[HARD_KEY_NUM] = { 0 };
     判断GPIO引脚是否有效按下
 */
 KEY_T s_tBtn[KEY_COUNT] = { 0 };
+
+#if (CONFIG_BSP_USE_RTOS == 0)
 KEY_FIFO_T s_tKey; /* 按键FIFO变量,结构体 */
+#endif
 
 static void bsp_InitKeyVar(void);
 static void bsp_InitKeyHard(void);
@@ -116,6 +120,7 @@ static uint8_t IsKeyDownFunc(uint8_t _id)
 */
 void bsp_InitKey(void)
 {
+
     bsp_InitKeyVar();  /* 初始化按键变量 */
     bsp_InitKeyHard(); /* 初始化按键硬件 */
 }
@@ -156,10 +161,13 @@ static void bsp_InitKeyVar(void)
     uint8_t i;
 
     /* 对按键FIFO读写指针清零 */
+#if (CONFIG_BSP_USE_RTOS == 0)
     s_tKey.Read = 0;
     s_tKey.Write = 0;
     s_tKey.Read2 = 0;
-
+#elif (CONFIG_BSP_USE_RTOS == 1)
+    s_KeyQueue = xQueueCreate(KEY_FIFO_SIZE, sizeof(uint8_t));
+#endif
     /* 给每个按键结构体成员变量赋一组缺省值 */
     for (i = 0; i < KEY_COUNT; i++) {
         s_tBtn[i].LongTime = KEY_LONG_TIME;    /* 长按时间 0 表示不检测长按键事件 */
@@ -186,11 +194,15 @@ static void bsp_InitKeyVar(void)
 */
 void bsp_PutKey(uint8_t _KeyCode)
 {
+#if (CONFIG_BSP_USE_RTOS == 0)
     s_tKey.Buf[s_tKey.Write] = _KeyCode;
 
     if (++s_tKey.Write >= KEY_FIFO_SIZE) {
         s_tKey.Write = 0;
     }
+#elif (CONFIG_BSP_USE_RTOS == 1)
+    xQueueSendFromISR(s_KeyQueue, &_KeyCode, 0);
+#endif
 }
 
 /*
@@ -204,7 +216,7 @@ void bsp_PutKey(uint8_t _KeyCode)
 uint8_t bsp_GetKey(void)
 {
     uint8_t ret;
-
+#if (CONFIG_BSP_USE_RTOS == 0)
     if (s_tKey.Read == s_tKey.Write) {
         return KEY_NONE;
     } else {
@@ -215,6 +227,10 @@ uint8_t bsp_GetKey(void)
         }
         return ret;
     }
+#elif (CONFIG_BSP_USE_RTOS == 1)
+    xQueueReceive(s_KeyQueue, &ret, portMAX_DELAY);
+    return ret;
+#endif
 }
 
 /*
@@ -228,7 +244,7 @@ uint8_t bsp_GetKey(void)
 uint8_t bsp_GetKey2(void)
 {
     uint8_t ret;
-
+#if (CONFIG_BSP_USE_RTOS == 0)
     if (s_tKey.Read2 == s_tKey.Write) {
         return KEY_NONE;
     } else {
@@ -239,6 +255,10 @@ uint8_t bsp_GetKey2(void)
         }
         return ret;
     }
+#elif (CONFIG_BSP_USE_RTOS == 1)
+    xQueuePeek(s_KeyQueue, &ret, portMAX_DELAY);
+    return ret;
+#endif
 }
 
 /*
@@ -269,7 +289,11 @@ void bsp_SetKeyParam(uint8_t _ucKeyID, uint16_t _LongTime, uint8_t _RepeatSpeed)
 */
 void bsp_ClearKey(void)
 {
+#if (CONFIG_BSP_USE_RTOS == 0)
     s_tKey.Read = s_tKey.Write;
+#elif (CONFIG_BSP_USE_RTOS == 1)
+    xQueueReset(s_KeyQueue);
+#endif
 }
 
 /*

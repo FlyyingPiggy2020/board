@@ -52,6 +52,13 @@ extern "C" {
 #define NVIC_PREEMPT_PRIORITY 4
 
 #include "bsp_config.h"
+#if (CONFIG_BSP_USE_RTOS == 1)
+#include "FreeRTOS.h"     // ARM.FreeRTOS::RTOS:Core
+#include "task.h"         // ARM.FreeRTOS::RTOS:Core
+#include "event_groups.h" // ARM.FreeRTOS::RTOS:Event Groups
+#include "semphr.h"       // ARM.FreeRTOS::RTOS:Core
+#include "queue.h"
+#endif
 /* 通过取消注释或者添加注释的方式控制是否包含底层驱动模块 */
 #include "bsp_adc.h"
 #include "bsp_i2c_eeprom_24xx.h"

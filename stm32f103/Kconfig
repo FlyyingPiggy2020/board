@@ -1,4 +1,13 @@
 menu "STM32F103 BOARD"
+    menu "SYS Configuration"
+        config BSP_USE_RTOS
+            int "IS USE RTOS.(0:no use 1:freeRTOS)"
+            default 0
+            range 0 1
+            help 
+                This option sets the tpye of RTOS.
+    endmenu
+
     menu "UART Configuration"
     # UART1 Configuration
     config BSP_UART1_EN

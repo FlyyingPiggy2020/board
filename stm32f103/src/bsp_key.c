@@ -4,7 +4,7 @@
  * @Author       : lxf
  * @Date         : 2024-11-26 13:18:49
  * @LastEditors  : FlyyingPiggy2020 154562451@qq.com
- * @LastEditTime : 2024-12-26 09:29:57
+ * @LastEditTime : 2025-01-18 15:28:02
  * @Brief        : 按键驱动魔改自安富莱
  */
 
@@ -16,7 +16,9 @@
 /*---------- variable prototype ----------*/
 /*---------- function prototype ----------*/
 /*---------- variable ----------*/
+#if (CONFIG_BSP_USE_RTOS == 1)
 static QueueHandle_t s_KeyQueue = NULL;
+#endif
 /*---------- function ----------*/
 /*---------- end of file ----------*/
 

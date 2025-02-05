@@ -65,6 +65,12 @@ menu "STM32F103 BOARD"
                 range 0 1
                 help
                     Select the TX enable level for UART1 485
+            
+            config BSP_USART1_485_CHECK_CONFILCTS
+                bool "is check bus confilcts"
+                default n
+                help
+                    check usart1 bus confilcts
             endif
         endif
 
@@ -275,5 +281,38 @@ menu "STM32F103 BOARD"
             default y
             help 
                 Enable hardware IWDG
+    endmenu
+
+    menu "I2C Configuration"
+        config BSP_SOFT_I2C_EN
+            bool "Enable soft i2c bus"
+            default n
+            help 
+                Enable soft i2c bus
+        if BSP_SOFT_I2C_EN
+            config BSP_I2C_VCC_IO
+                string "GPIO for I2C VCC"
+                default "A.00"
+                help
+                    Select the GPIO for I2C VCC
+
+            config BSP_I2C_WP_IO
+                string "GPIO for I2C WP"
+                default "C.13"
+                help
+                    Select the GPIO for I2C WP
+                    
+            config BSP_I2C_SCL_IO
+                string "GPIO for I2C SCL"
+                default "C.14"
+                help
+                    Select the GPIO for I2C SCL
+
+            config BSP_I2C_SDA_IO
+                string "GPIO for I2C SDA"
+                default "C.15"
+                help
+                    Select the GPIO for I2C SDA
+        endif
     endmenu
 endmenu

@@ -4,7 +4,7 @@
  * @Author       : lxf
  * @Date         : 2024-11-26 15:36:00
  * @LastEditors  : FlyyingPiggy2020 154562451@qq.com
- * @LastEditTime : 2024-12-16 17:30:54
+ * @LastEditTime : 2025-02-05 16:06:03
  * @Brief        : stm32f103串口驱动程序
  * 更新日志：
  * 2024-11-26   lxf     魔改自安富莱串口驱动程序，支持了通过字符串配置串口
@@ -845,7 +845,33 @@ uint8_t comTxEmpty(COM_PORT_E _ucPort)
     }
     return 1;
 }
-#define COMx_485 COM1//TODO:
+/**
+ * @brief 总线是否校验冲突
+ * @param {COM_PORT_E} com
+ * @return {*}
+ */
+static bool inline is_check_bus_confilcts(COM_PORT_E com)
+{
+
+#if CONFIG_BSP_USART1_485_CHECK_CONFILCTS
+    if (com == COM1) {
+        return true;
+    }
+#endif
+
+#if CONFIG_BSP_USART2_485_CHECK_CONFILCTS
+    if (com == COM2) {
+        return true;
+    }
+#endif
+
+#if CONFIG_BSP_USART3_485_CHECK_CONFILCTS
+    if (com == COM3) {
+        return true;
+    }
+#endif
+    return false;
+}
 
 #if (CONFIG_BSP_UART1_EN == 1) || (CONFIG_BSP_UART2_EN == 1) || (CONFIG_BSP_UART3_EN == 1)
 /*
@@ -867,7 +893,7 @@ static void UartIRQ(UART_T *_pUart)
         uint8_t ch;
 
         ch = READ_REG(_pUart->uart->DR);
-        if (_pUart->com == COMx_485) {
+        if (is_check_bus_confilcts(_pUart->com)) {
             if (_pUart->usTxCnt < _pUart->usTxPos) {
                 if (ch == _pUart->pTxBuf[_pUart->usTxCnt]) {
                     _pUart->usTxCnt++;

@@ -48,6 +48,10 @@ void bsp_Init(void)
 #if (CONFIG_BSP_ADC_CH_MAX >= 1)
     bsp_adc_init();
 #endif
+
+#if (CONFIG_BSP_SOFT_I2C_EN)
+    bsp_InitI2C();
+#endif
 }
 
 /*

@@ -4,8 +4,7 @@
 *   模块名称 : I2C总线驱动模块
 *   文件名称 : bsp_i2c_gpio.c
 *   版    本 : V1.0
-*   说    明 : 用gpio模拟i2c总线,
-*适用于STM32F4系列CPU。该模块不包括应用层命令帧，仅包括I2C总线基本操作函数。
+*   说    明 : 用gpio模拟i2c总线, 适用于STM32F4系列CPU。该模块不包括应用层命令帧，仅包括I2C总线基本操作函数。
 *
 *   修改记录 :
 *       版本号  日期        作者     说明
@@ -16,52 +15,48 @@
 *********************************************************************************************************
 */
 
-/*
-    应用说明：
-    在访问I2C设备前，请先调用 i2c_CheckDevice()
-   检测I2C设备是否正常，该函数会配置GPIO
-*/
-
 #include "bsp.h"
 
-/*
-    安富莱STM32-V5开发板 i2c总线GPIO:
-        PB6/I2C2_SCL
-        PB7/I2C2_SDA
-*/
 
-/* 定义I2C总线连接的GPIO端口,
- * 用户只需要修改下面4行代码即可任意改变SCL和SDA的引脚 */
 
-#define ALL_I2C_GPIO_CLK_ENABLE()     \
-    {                                 \
-        __HAL_RCC_GPIOB_CLK_ENABLE(); \
-        __HAL_RCC_GPIOC_CLK_ENABLE(); \
-    };
+/* 依次定义GPIO */
+typedef struct {
+    GPIO_TypeDef *gpio;
+    uint32_t pin;
+} L_GPIO_T;
 
-#define GPIO_PORT_VCC GPIOB      /* GPIO端口 */
-#define I2C_VCC_PIN   GPIO_PIN_4 /* 连接到VCC数据线的GPIO */
+static L_GPIO_T l_gpio_list[4] = {
+};
 
-#define GPIO_PORT_I2C GPIOC       /* GPIO端口 */
-#define I2C_WP_PIN    GPIO_PIN_13 /* 连接到WP数据线的GPIO */
-#define I2C_SCL_PIN   GPIO_PIN_14 /* 连接到SCL时钟线的GPIO */
-#define I2C_SDA_PIN   GPIO_PIN_15 /* 连接到SDA数据线的GPIO */
+typedef enum {
+    I2C_VCC_INDEX = 0,
+    I2C_WP_INDEX,
+    I2C_SCL_INDEX,
+    I2C_SDA_INDEX,
+} I2C_GPIO_NAME;
+
+#define GPIO_PORT_VCC  l_gpio_list[I2C_VCC_INDEX].gpio      /* GPIO端口 */
+#define I2C_VCC_PIN    l_gpio_list[I2C_VCC_INDEX].pin /* 连接到VCC数据线的GPIO */
+
+#define GPIO_PORT_I2C  l_gpio_list[I2C_SCL_INDEX].gpio       /* GPIO端口 */
+#define I2C_WP_PIN     l_gpio_list[I2C_WP_INDEX].pin /* 连接到WP数据线的GPIO */
+#define I2C_SCL_PIN    l_gpio_list[I2C_SCL_INDEX].pin /* 连接到SCL时钟线的GPIO */
+#define I2C_SDA_PIN    l_gpio_list[I2C_SDA_INDEX].pin /* 连接到SDA数据线的GPIO */
 
 /* 定义读写SCL和SDA的宏 */
-#define I2C_VCC_1()   GPIO_PORT_VCC->BSRR = (uint32_t)I2C_VCC_PIN        /* VCC = 1 */
-#define I2C_VCC_0()   GPIO_PORT_VCC->BSRR = (uint32_t)I2C_VCC_PIN << 16U /* VCC = 0 */
+#define I2C_VCC_1()    GPIO_PORT_VCC->BSRR = (uint32_t)I2C_VCC_PIN        /* VCC = 1 */
+#define I2C_VCC_0()    GPIO_PORT_VCC->BSRR = (uint32_t)I2C_VCC_PIN << 16U /* VCC = 0 */
 
-#define I2C_WP_1()    GPIO_PORT_I2C->BSRR = (uint32_t)I2C_WP_PIN        /* WP = 1 */
-#define I2C_WP_0()    GPIO_PORT_I2C->BSRR = (uint32_t)I2C_WP_PIN << 16U /* WP = 0 */
+#define I2C_WP_1()     GPIO_PORT_I2C->BSRR = (uint32_t)I2C_WP_PIN        /* WP = 1 */
+#define I2C_WP_0()     GPIO_PORT_I2C->BSRR = (uint32_t)I2C_WP_PIN << 16U /* WP = 0 */
 
-#define I2C_SCL_1()   GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SCL_PIN        /* SCL = 1 */
-#define I2C_SCL_0()   GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SCL_PIN << 16U /* SCL = 0 */
+#define I2C_SCL_1()    GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SCL_PIN        /* SCL = 1 */
+#define I2C_SCL_0()    GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SCL_PIN << 16U /* SCL = 0 */
 
-#define I2C_SDA_1()   GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SDA_PIN        /* SDA = 1 */
-#define I2C_SDA_0()   GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SDA_PIN << 16U /* SDA = 0 */
+#define I2C_SDA_1()    GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SDA_PIN        /* SDA = 1 */
+#define I2C_SDA_0()    GPIO_PORT_I2C->BSRR = (uint32_t)I2C_SDA_PIN << 16U /* SDA = 0 */
 
-#define I2C_WP_READ() \
-    ((GPIO_PORT_I2C->IDR & I2C_WP_PIN) != 0)                     /* 读WP口线状态 */
+#define I2C_WP_READ()  ((GPIO_PORT_I2C->IDR & I2C_WP_PIN) != 0)  /* 读WP口线状态 */
 #define I2C_SDA_READ() ((GPIO_PORT_I2C->IDR & I2C_SDA_PIN) != 0) /* 读SDA口线状态 */
 #define I2C_SCL_READ() ((GPIO_PORT_I2C->IDR & I2C_SCL_PIN) != 0) /* 读SCL口线状态 */
 
@@ -78,7 +73,10 @@ void bsp_InitI2C(void)
     GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
     /* GPIO Ports Clock Enable */
-    ALL_I2C_GPIO_CLK_ENABLE();
+    _translate_pin_name(CONFIG_BSP_I2C_VCC_IO, &l_gpio_list[I2C_VCC_INDEX].gpio, &l_gpio_list[I2C_VCC_INDEX].pin);
+    _translate_pin_name(CONFIG_BSP_I2C_WP_IO, &l_gpio_list[I2C_WP_INDEX].gpio, &l_gpio_list[I2C_WP_INDEX].pin);
+    _translate_pin_name(CONFIG_BSP_I2C_SCL_IO, &l_gpio_list[I2C_SCL_INDEX].gpio, &l_gpio_list[I2C_SCL_INDEX].pin);
+    _translate_pin_name(CONFIG_BSP_I2C_SDA_IO, &l_gpio_list[I2C_SDA_INDEX].gpio, &l_gpio_list[I2C_SDA_INDEX].pin);
 
     /*Configure GPIO pins : PB6 PB7 */
     GPIO_InitStruct.Pin = I2C_SCL_PIN | I2C_SDA_PIN;
@@ -87,14 +85,14 @@ void bsp_InitI2C(void)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     HAL_GPIO_Init(GPIO_PORT_I2C, &GPIO_InitStruct);
 
-    if (I2C_WP_PIN != -1) {
+    if (I2C_WP_PIN != 0) {
         GPIO_InitStruct.Pin = (uint32_t)I2C_WP_PIN;
         GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
         GPIO_InitStruct.Pull = GPIO_PULLUP;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
         HAL_GPIO_Init(GPIO_PORT_I2C, &GPIO_InitStruct);
     }
-    if (I2C_VCC_PIN != -1) {
+    if (I2C_VCC_PIN != 0) {
         GPIO_InitStruct.Pin = (uint32_t)I2C_VCC_PIN;
         GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
         GPIO_InitStruct.Pull = GPIO_PULLUP;
@@ -108,9 +106,6 @@ void bsp_InitI2C(void)
     i2c_WPDisable();
     /* 给一个停止信号, 复位I2C总线上的所有设备到待机模式 */
     i2c_Stop();
-    //    /* 检测芯片是否正常 */
-    //    if (ee_CheckOk() < 0) {
-    //    }
 }
 /*
 *********************************************************************************************************
@@ -126,8 +121,7 @@ static void i2c_Delay(void)
 
     /*
         CPU主频168MHz时，在内部Flash运行, MDK工程不优化。用台式示波器观测波形。
-        循环次数为5时，SCL频率 = 1.78MHz (读耗时: 92ms,
-       读写正常，但是用示波器探头碰上就读写失败。时序接近临界)
+        循环次数为5时，SCL频率 = 1.78MHz (读耗时: 92ms, 读写正常，但是用示波器探头碰上就读写失败。时序接近临界)
         循环次数为10时，SCL频率 = 1.1MHz (读耗时: 138ms, 读速度: 118724B/s)
         循环次数为30时，SCL频率 = 440KHz， SCL高电平时间1.0us，SCL低电平时间1.2us
 
@@ -148,7 +142,7 @@ static void i2c_Delay(void)
 */
 void i2c_VCCEnable(void)
 {
-    if (I2C_VCC_PIN != -1) {
+    if (I2C_VCC_PIN != 0) {
         I2C_VCC_0();
         i2c_Delay();
     }
@@ -164,7 +158,7 @@ void i2c_VCCEnable(void)
 */
 void i2c_VCCDisable(void)
 {
-    if (I2C_VCC_PIN != -1) {
+    if (I2C_VCC_PIN != 0) {
         i2c_Delay();
         I2C_VCC_1();
     }
@@ -179,7 +173,7 @@ void i2c_VCCDisable(void)
 */
 void i2c_WPEnable(void)
 {
-    if (I2C_WP_PIN != -1) {
+    if (I2C_WP_PIN != 0) {
         I2C_WP_0();
         i2c_Delay();
     }
@@ -195,7 +189,7 @@ void i2c_WPEnable(void)
 */
 void i2c_WPDisable(void)
 {
-    if (I2C_WP_PIN != -1) {
+    if (I2C_WP_PIN != 0) {
         i2c_Delay();
         I2C_WP_1();
     }
@@ -389,9 +383,9 @@ void i2c_NAck(void)
 /*
 *********************************************************************************************************
 *   函 数 名: i2c_CheckDevice
-*   功能说明:
-*检测I2C总线设备，CPU向发送设备地址，然后读取设备应答来判断该设备是否存在 形 参:
-*_Address：设备的I2C总线地址 返 回 值: 返回值 0 表示正确， 返回1表示未探测到
+*   功能说明: 检测I2C总线设备，CPU向发送设备地址，然后读取设备应答来判断该设备是否存在
+*   形    参:  _Address：设备的I2C总线地址
+*   返 回 值: 返回值 0 表示正确， 返回1表示未探测到
 *********************************************************************************************************
 */
 uint8_t i2c_CheckDevice(uint8_t _Address)

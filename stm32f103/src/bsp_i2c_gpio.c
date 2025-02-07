@@ -17,16 +17,13 @@
 
 #include "bsp.h"
 
-
-
 /* 依次定义GPIO */
 typedef struct {
     GPIO_TypeDef *gpio;
     uint32_t pin;
 } L_GPIO_T;
 
-static L_GPIO_T l_gpio_list[4] = {
-};
+static L_GPIO_T l_gpio_list[4] = {};
 
 typedef enum {
     I2C_VCC_INDEX = 0,
@@ -35,13 +32,13 @@ typedef enum {
     I2C_SDA_INDEX,
 } I2C_GPIO_NAME;
 
-#define GPIO_PORT_VCC  l_gpio_list[I2C_VCC_INDEX].gpio      /* GPIO端口 */
-#define I2C_VCC_PIN    l_gpio_list[I2C_VCC_INDEX].pin /* 连接到VCC数据线的GPIO */
+#define GPIO_PORT_VCC  l_gpio_list[I2C_VCC_INDEX].gpio /* GPIO端口 */
+#define I2C_VCC_PIN    l_gpio_list[I2C_VCC_INDEX].pin  /* 连接到VCC数据线的GPIO */
 
-#define GPIO_PORT_I2C  l_gpio_list[I2C_SCL_INDEX].gpio       /* GPIO端口 */
-#define I2C_WP_PIN     l_gpio_list[I2C_WP_INDEX].pin /* 连接到WP数据线的GPIO */
-#define I2C_SCL_PIN    l_gpio_list[I2C_SCL_INDEX].pin /* 连接到SCL时钟线的GPIO */
-#define I2C_SDA_PIN    l_gpio_list[I2C_SDA_INDEX].pin /* 连接到SDA数据线的GPIO */
+#define GPIO_PORT_I2C  l_gpio_list[I2C_SCL_INDEX].gpio /* GPIO端口 */
+#define I2C_WP_PIN     l_gpio_list[I2C_WP_INDEX].pin   /* 连接到WP数据线的GPIO */
+#define I2C_SCL_PIN    l_gpio_list[I2C_SCL_INDEX].pin  /* 连接到SCL时钟线的GPIO */
+#define I2C_SDA_PIN    l_gpio_list[I2C_SDA_INDEX].pin  /* 连接到SDA数据线的GPIO */
 
 /* 定义读写SCL和SDA的宏 */
 #define I2C_VCC_1()    GPIO_PORT_VCC->BSRR = (uint32_t)I2C_VCC_PIN        /* VCC = 1 */

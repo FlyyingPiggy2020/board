@@ -201,6 +201,14 @@ uint16_t bsp_adc_getvalue(uint8_t ad_num)
 #endif
 }
 
+
+#if CONFIG_BSP_USE_POWER_CHECK >= 1
+__weak void power_down_cb(void)
+{
+    
+}
+#endif
+
 /**
  * @brief 在1ms时间片中循环执行(嘀嗒中断)
  * @return {*}
@@ -210,16 +218,13 @@ void PowerDown_Check_Poll(void)
 #if CONFIG_BSP_USE_POWER_CHECK >= 1
     static uint16_t Time_PowerDown = 0;
     uint16_t tmp16 = bsp_adc_getvalue(AD_PD);
-    if (tmp16 < 3200) {
-        if (++Time_PowerDown > 10) {
-        }
-        if (Time_PowerDown > 40) {
+    if (tmp16 < CONFIG_PD_ADC_VALUE) {
+        if (++Time_PowerDown > CONFIG_PD_ADC_TIME) {
             /* 1.关闭所有中断 */
             DISABLE_INT();
             /* 2.禁能电源引脚，使能WP引脚 */
-            i2c_VCCDisable();
-            i2c_WPDisable();
             /* 3.程序阻塞在这里 */
+            power_down_cb();
             while (1)
                 ;
         }
@@ -230,4 +235,5 @@ void PowerDown_Check_Poll(void)
     return;
 #endif
 }
+
 /*---------- end of file ----------*/

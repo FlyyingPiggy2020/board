@@ -182,6 +182,20 @@ menu "STM32F103 BOARD"
                 default n
                 help
                     Enable power check
+            if BSP_USE_POWER_CHECK
+                config PD_ADC_VALUE
+                    int "Power Down ADC value"
+                    default 3200
+                    range 0 4096
+                    help
+                        This option sets the power down ADC value.
+                config PD_ADC_TIME
+                    int "Power Down time"
+                    default 40
+                    range 0 1000
+                    help
+                        This option sets the power down time.
+            endif
 
             config BSP_ADC1_CH1_IO
                 string "ADC1 Channel GPIO1.The GPIO will be used as a PD IO if Power Check is enabled."

@@ -201,11 +201,9 @@ uint16_t bsp_adc_getvalue(uint8_t ad_num)
 #endif
 }
 
-
 #if CONFIG_BSP_USE_POWER_CHECK >= 1
 __weak void power_down_cb(void)
 {
-    
 }
 #endif
 

@@ -92,7 +92,7 @@ void bsp_Error_Handler(char *file, uint32_t line)
 void bsp_Idle(void)
 {
 /* --- 喂狗 */
-#if !DEBUG
+#if CONFIG_BSP_HARD_IWDG_EN
     extern IWDG_HandleTypeDef hiwdg;
     HAL_IWDG_Refresh(&hiwdg);
 #endif

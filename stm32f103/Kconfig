@@ -275,7 +275,7 @@ menu "STM32F103 BOARD"
     menu "TIMER Configuration"
         config BSP_HARD_TIMER_EN
             bool "Enable hardware timer (for microsecond level timeout callback)"
-            default y
+            default n
             help 
                 Enable hardware timer for microsecond level timeout callback
             
@@ -292,7 +292,7 @@ menu "STM32F103 BOARD"
     menu "IWDG Configuration"
         config BSP_HARD_IWDG_EN
             bool "Enable hardware IWDG"
-            default y
+            default n
             help 
                 Enable hardware IWDG
     endmenu

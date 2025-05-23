@@ -35,6 +35,12 @@ uint8_t g_TxBuf3[CONFIG_BSP_UART3_TX_BUF_SIZE]; /* 发送缓冲区 */
 uint8_t g_RxBuf3[CONFIG_BSP_UART3_RX_BUF_SIZE]; /* 接收缓冲区 */
 #endif
 
+#if CONFIG_BSP_UART4_EN == 1
+UART_T g_tUart4;
+uint8_t g_TxBuf4[CONFIG_BSP_UART4_TX_BUF_SIZE]; /* 发送缓冲区 */
+uint8_t g_RxBuf4[CONFIG_BSP_UART4_RX_BUF_SIZE]; /* 接收缓冲区 */
+#endif
+
 #if CONFIG_BSP_USART1_485_EN == 1
 
 #endif
@@ -52,7 +58,7 @@ static int32_t UartSend(UART_T *_pUart, uint8_t *_ucaBuf, uint16_t _usLen);
 static uint8_t UartGetChar(UART_T *_pUart, uint8_t *_pByte);
 static uint16_t UartGetBuf(UART_T *_pUart, uint8_t *_ucaBuf, uint16_t _usLen);
 static uint16_t UartSetBuf(UART_T *_pUart, uint8_t *_ucaBuf, uint16_t _usLen);
-#if (CONFIG_BSP_UART1_EN == 1) || (CONFIG_BSP_UART2_EN == 1) || (CONFIG_BSP_UART3_EN == 1)
+#if (CONFIG_BSP_UART1_EN == 1) || (CONFIG_BSP_UART2_EN == 1) || (CONFIG_BSP_UART3_EN == 1) || (CONFIG_BSP_UART4_EN == 1)
 static void UartIRQ(UART_T *_pUart);
 #endif
 void RS485_InitTXE(void);
@@ -509,6 +515,26 @@ static void UartVarInit(void)
     g_tUart3.Sending = 0;                                /* 正在发送中标志 */
     g_tUart3.IdleCallback = 0;
 #endif
+
+#if CONFIG_BSP_UART4_EN == 1
+    g_tUart4.com = COM4;                                 /* 当前串口信息 */
+    g_tUart4.uart = UART4;                              /* STM32 串口设备 */
+    g_tUart4.pTxBuf = g_TxBuf4;                          /* 发送缓冲区指针 */
+    g_tUart4.pRxBuf = g_RxBuf4;                          /* 接收缓冲区指针 */
+    g_tUart4.usTxBufSize = CONFIG_BSP_UART4_TX_BUF_SIZE; /* 发送缓冲区大小 */
+    g_tUart4.usRxBufSize = CONFIG_BSP_UART4_RX_BUF_SIZE; /* 接收缓冲区大小 */
+    g_tUart4.usTxWrite = 0;                              /* 发送FIFO写索引 */
+    g_tUart4.usTxRead = 0;                               /* 发送FIFO读索引 */
+    g_tUart4.usRxWrite = 0;                              /* 接收FIFO写索引 */
+    g_tUart4.usRxRead = 0;                               /* 接收FIFO读索引 */
+    g_tUart4.usRxCount = 0;                              /* 接收到的新数据个数 */
+    g_tUart4.usTxCount = 0;                              /* 待发送的数据个数 */
+    g_tUart4.SendBefor = RS485_SendBefor;                /* 发送数据前的回调函数 */
+    g_tUart4.SendOver = RS485_SendOver;                  /* 发送完毕后的回调函数 */
+    g_tUart4.ReciveNew = 0;                              /* 接收到新数据后的回调函数 */
+    g_tUart4.Sending = 0;                                /* 正在发送中标志 */
+    g_tUart4.IdleCallback = 0;
+#endif
 }
 
 /**
@@ -551,7 +577,7 @@ void comSetUartParam(USART_TypeDef *Instance, uint32_t BaudRate, uint16_t WordLe
 */
 static void InitHardUart(void)
 {
-#if (CONFIG_BSP_UART1_EN == 1) || (CONFIG_BSP_UART2_EN == 1) || (CONFIG_BSP_UART3_EN == 1)
+#if (CONFIG_BSP_UART1_EN == 1) || (CONFIG_BSP_UART2_EN == 1) || (CONFIG_BSP_UART3_EN == 1) || (CONFIG_BSP_UART4_EN == 1)
     GPIO_InitTypeDef GPIO_InitStruct;
     GPIO_TypeDef *tx_port, *rx_port;
     uint32_t tx_pin, rx_pin;
@@ -657,6 +683,40 @@ static void InitHardUart(void)
         CLEAR_BIT(USART3->SR, USART_SR_RXNE);   /* 清除RXNE接收标志 */
         SET_BIT(USART3->CR1, USART_CR1_RXNEIE); /* 使能PE. RX接受中断 */
         SET_BIT(USART3->CR1, USART_CR1_IDLEIE);
+    } while (0);
+
+#endif
+
+#if CONFIG_BSP_UART4_EN == 1 /* 串口3 */
+    do {
+        if (!_translate_pin_name(CONFIG_BSP_USART4_TX_IO, &tx_port, &tx_pin) || !_translate_pin_name(CONFIG_BSP_USART4_RX_IO, &rx_port, &rx_pin)) {
+            break;
+        } /* 使能 USARTx 时钟 */
+        __HAL_RCC_UART4_CLK_ENABLE();
+
+        /* 配置TX引脚 */
+        GPIO_InitStruct.Pin = tx_pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Pull = GPIO_PULLUP;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+        HAL_GPIO_Init(tx_port, &GPIO_InitStruct);
+
+        /* 配置RX引脚 */
+        GPIO_InitStruct.Pin = rx_pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+        HAL_GPIO_Init(rx_port, &GPIO_InitStruct);
+
+        /* 配置NVIC the NVIC for UART */
+        HAL_NVIC_SetPriority(UART4_IRQn, 0, 0);
+        HAL_NVIC_EnableIRQ(UART4_IRQn);
+
+        /* 配置波特率、奇偶校验 */
+        comSetUartParam(UART4, CONFIG_BSP_UART4_BAUD, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX);
+
+        CLEAR_BIT(UART4->SR, USART_SR_TC);     /* 清除TC发送完成标志 */
+        CLEAR_BIT(UART4->SR, USART_SR_RXNE);   /* 清除RXNE接收标志 */
+        SET_BIT(UART4->CR1, USART_CR1_RXNEIE); /* 使能PE. RX接受中断 */
+        SET_BIT(UART4->CR1, USART_CR1_IDLEIE);
     } while (0);
 
 #endif
@@ -870,10 +930,16 @@ static bool inline is_check_bus_confilcts(COM_PORT_E com)
         return true;
     }
 #endif
+    
+#if CONFIG_BSP_USART4_485_CHECK_CONFILCTS
+    if (com == COM4) {
+        return true;
+    }
+#endif
     return false;
 }
 
-#if (CONFIG_BSP_UART1_EN == 1) || (CONFIG_BSP_UART2_EN == 1) || (CONFIG_BSP_UART3_EN == 1)
+#if (CONFIG_BSP_UART1_EN == 1) || (CONFIG_BSP_UART2_EN == 1) || (CONFIG_BSP_UART3_EN == 1) || (CONFIG_BSP_UART4_EN == 1)
 /*
 *********************************************************************************************************
 *   函 数 名: UartIRQ
@@ -1011,6 +1077,12 @@ void USART3_IRQHandler(void)
 }
 #endif
 
+#if CONFIG_BSP_UART4_EN == 1
+void UART4_IRQHandler(void)
+{
+    UartIRQ(&g_tUart4);
+}
+#endif
 #if (PRINTF_MODE == PRINTF_UART) // 串口调试
 /*
 *********************************************************************************************************

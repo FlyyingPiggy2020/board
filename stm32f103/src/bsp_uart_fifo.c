@@ -518,7 +518,7 @@ static void UartVarInit(void)
 
 #if CONFIG_BSP_UART4_EN == 1
     g_tUart4.com = COM4;                                 /* 当前串口信息 */
-    g_tUart4.uart = UART4;                              /* STM32 串口设备 */
+    g_tUart4.uart = UART4;                               /* STM32 串口设备 */
     g_tUart4.pTxBuf = g_TxBuf4;                          /* 发送缓冲区指针 */
     g_tUart4.pRxBuf = g_RxBuf4;                          /* 接收缓冲区指针 */
     g_tUart4.usTxBufSize = CONFIG_BSP_UART4_TX_BUF_SIZE; /* 发送缓冲区大小 */
@@ -930,7 +930,7 @@ static bool inline is_check_bus_confilcts(COM_PORT_E com)
         return true;
     }
 #endif
-    
+
 #if CONFIG_BSP_USART4_485_CHECK_CONFILCTS
     if (com == COM4) {
         return true;
